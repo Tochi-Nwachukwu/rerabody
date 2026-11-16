@@ -57,5 +57,5 @@ test("product page shows variant price and stock state", async ({ page }) => {
     page.getByText(/In stock|Only \d+ left|Sold out/).filter({ visible: true }),
   ).toBeVisible();
   await expect(page).toHaveURL(/variant=/);
-  await expect(page.getByText("£52.00")).toBeVisible();
+  await expect(page.getByText("£52.00").filter({ visible: true }).first()).toBeVisible();
 });

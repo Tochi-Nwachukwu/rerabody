@@ -1,5 +1,15 @@
 import type { ComponentType } from "react";
 
+import {
+  AdminNewOrder,
+  OrderCancelled,
+  OrderConfirmation,
+  OrderDeliveredReview,
+  OrderOutForDelivery,
+  OrderProcessing,
+  OrderRefunded,
+  OrderShipped,
+} from "./order-emails";
 import PasswordReset from "./password-reset";
 import VerifyEmail from "./verify-email";
 import Welcome from "./welcome";
@@ -33,6 +43,46 @@ export const emailTemplates = {
     stream: "orders",
   }),
   welcome: define({ component: Welcome, subject: () => "Welcome to Rera Body", stream: "orders" }),
+  "order-confirmation": define({
+    component: OrderConfirmation,
+    subject: (p) => `Order ${p.order.number} confirmed`,
+    stream: "orders",
+  }),
+  "admin-new-order": define({
+    component: AdminNewOrder,
+    subject: (p) => `${p.needsReview ? "[Review needed] " : ""}New order ${p.order.number}`,
+    stream: "orders",
+  }),
+  "order-processing": define({
+    component: OrderProcessing,
+    subject: (p) => `We are preparing order ${p.order.number}`,
+    stream: "orders",
+  }),
+  "order-shipped": define({
+    component: OrderShipped,
+    subject: (p) => `Order ${p.order.number} has shipped`,
+    stream: "orders",
+  }),
+  "order-out-for-delivery": define({
+    component: OrderOutForDelivery,
+    subject: (p) => `Order ${p.order.number} is out for delivery`,
+    stream: "orders",
+  }),
+  "order-delivered-review": define({
+    component: OrderDeliveredReview,
+    subject: (p) => `Order ${p.order.number} was delivered`,
+    stream: "orders",
+  }),
+  "order-cancelled": define({
+    component: OrderCancelled,
+    subject: (p) => `Order ${p.order.number} was cancelled`,
+    stream: "orders",
+  }),
+  "order-refunded": define({
+    component: OrderRefunded,
+    subject: (p) => `Refund for order ${p.order.number}`,
+    stream: "orders",
+  }),
 };
 
 export type EmailTemplateName = keyof typeof emailTemplates;

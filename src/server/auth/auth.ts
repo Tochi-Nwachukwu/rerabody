@@ -20,6 +20,17 @@ export const auth = betterAuth({
     database: { generateId: false },
   },
   user: {
+    // S22 "delete account" (password confirmation). Orders keep their history (userId set null).
+    deleteUser: {
+      enabled: true,
+      async beforeDelete(user) {
+        const u = await db.user.findUnique({ where: { id: user.id }, select: { roleId: true } });
+        if (u?.roleId)
+          throw new APIError("FORBIDDEN", {
+            message: "Staff accounts are removed by the store owner.",
+          });
+      },
+    },
     additionalFields: {
       phone: { type: "string", required: false, input: true },
       roleId: { type: "string", required: false, input: false },

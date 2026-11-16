@@ -102,3 +102,22 @@ Choices made where the build plan was silent or a dependency forced a change. Ne
 | Stripe session | 60 minute expiry, idempotency keys per order, order id in metadata and `client_reference_id`, API version pinned by stripe-node 23 (`2026-10-28.endive`) | |
 | Fake provider | `PAYMENT_PROVIDER=fake`: checkout goes to `/checkout/fake-pay`; its buttons sign an event with HMAC and feed it to the same `handlePaymentEvent` the Stripe webhook uses | Tests and local work exercise the real pipeline |
 | Success page | Reads the order (owner session or guest token), shows status and polls with `router.refresh()` every 2 seconds for up to 90 seconds. Never writes | Rule 1 |
+
+## Phase 5
+
+| Topic | Decision | Why |
+| --- | --- | --- |
+| Routes | A10 `/admin/orders`, A11 `/admin/orders/[id]`, packing slip `/admin/print/orders/[id]`, S18 `/account`, S19 `/account/orders`, S20 `/account/orders/[id]`, S21 `/account/addresses`, S22 `/account/profile`, S24 `/orders/track` | No screen map |
+| Email order links | Emails link to S24 with an HMAC signature of the order id (`sig`), not the random checkout token | The raw token only exists during checkout; the confirmation is sent later from the webhook. Rule 12 holds: nothing usable is stored. S24 also accepts the checkout token, and order number plus email |
+| S24 lookup | Order number plus the email used at checkout redirects to the signed link | Guests who lost the email can still find their order |
+| Status buttons | A11 shows only the moves rule 4 allows from the current status. SHIPPED requires carrier and tracking number in a modal | Plan |
+| Double clicks | `transitionOrder` updates conditionally on the status it read, so a second click fails without writing; emails dedupe by `{orderId}:{status}` | Phase 5 check |
+| Cancel | Only before shipping. Cancelling a paid order refunds the full remaining amount through the provider first (needs `orders.refund`), with an optional restock | Money taken must go back |
+| Refunds | Partial or full. A full refund moves the order to REFUNDED; a partial one leaves the status and adds an order note. Provider called first with an idempotency key | REFUNDED means fully refunded |
+| Restock | Returns the units recorded by the order's SALE movements, once per order (REFUND movements) | Never restocks units that were not taken (rule 3 shortage) |
+| Resend email | Sends the current status email again with a `:resend:{timestamp}` suffix on the dedupe key, so it is logged and deliberate | Normal sends stay deduplicated |
+| Admin alert | `admin-new-order` goes to `notifications.adminAlertEmail` in settings; subject is prefixed when the order needs manual review | Rule 3 asks to alert the admin |
+| Cancellation email | Sent for expired or failed payment sessions too | build-plan.md lifecycle table |
+| Delivered email | One review link per distinct product, signed and valid for 120 days | Phase 7 builds the form |
+| Account deletion | Better Auth `deleteUser` with password confirmation; staff accounts are refused. Orders keep their history (`userId` set null) | Accounts module in build-plan.md |
+| Resend webhook | Verified with the Svix headers through `resend.webhooks.verify`, deduplicated through `ProcessedWebhookEvent` (provider `resend`). Bounces and complaints mark the newsletter subscriber BOUNCED and the EmailLog row | Plan |
