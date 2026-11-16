@@ -7,7 +7,9 @@ import { nextCookies } from "better-auth/next-js";
 
 import { env } from "@/env";
 import { db } from "@/server/db";
+import { readCartCookie } from "@/server/cart-cookie";
 import { sendEmail } from "@/server/email";
+import { mergeGuestCart } from "@/server/services/cart";
 
 export const auth = betterAuth({
   baseURL: env.NEXT_PUBLIC_APP_URL,
@@ -83,6 +85,15 @@ export const auth = betterAuth({
           if (!user || user.status === "DEACTIVATED") {
             throw new APIError("FORBIDDEN", { message: "This account has been deactivated." });
           }
+        },
+        // Merge any guest cart into the account cart on sign in.
+        async after(session, ctx) {
+          const cookieHeader = ctx?.headers?.get("cookie") ?? ctx?.request?.headers.get("cookie");
+          const guestToken = readCartCookie(cookieHeader);
+          if (!guestToken) return;
+          await mergeGuestCart(db, guestToken, session.userId).catch((e) =>
+            console.error("[cart] merge failed", e),
+          );
         },
       },
     },

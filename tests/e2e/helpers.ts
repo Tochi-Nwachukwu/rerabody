@@ -78,3 +78,37 @@ export function pngFile(name: string) {
     "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGP4z8DAwMDAxMDAwMDAAAANHQEDK+mmyAAAAABJRU5ErkJggg==";
   return { name, mimeType: "image/png", buffer: Buffer.from(base64, "base64") };
 }
+
+/** Adds the first in-stock variant of a seeded product to the cart from its product page. */
+export async function addProductToCart(page: Page, slug: string) {
+  await page.goto(`/products/${slug}`);
+  await page.getByRole("button", { name: "Add to cart" }).click();
+  await expect(page.getByRole("dialog").getByRole("heading", { name: "Your cart" })).toBeVisible();
+}
+
+export async function fillCheckoutAddress(page: Page, email?: string) {
+  if (email) await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Full name").fill("Test Buyer");
+  await page.getByLabel("Phone").fill("07000000000");
+  await page.getByLabel("Address line 1").fill("1 Test Street");
+  await page.getByLabel("Town or city").fill("London");
+  await page.getByLabel("Postcode").fill("E1 1AA");
+}
+
+/** Guest checkout through the fake payment page. Returns the order number. */
+export async function checkoutAsGuest(page: Page, email: string): Promise<string> {
+  await page.goto("/checkout");
+  await fillCheckoutAddress(page, email);
+  await page.getByRole("button", { name: "Pay now" }).click();
+  await expect(page.getByRole("heading", { name: /^Pay / })).toBeVisible({ timeout: 15_000 });
+  await page.getByRole("button", { name: "Pay (test)" }).click();
+  await expect(page.getByRole("heading", { name: "Thank you for your order" })).toBeVisible({
+    timeout: 20_000,
+  });
+  const label = await page
+    .getByText(/^Order RB-\d+$/)
+    .filter({ visible: true })
+    .first()
+    .textContent();
+  return label!.replace("Order ", "");
+}

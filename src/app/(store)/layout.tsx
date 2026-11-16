@@ -1,14 +1,18 @@
+import { CartProvider } from "@/components/store/cart/cart-context";
+import { CartButton, CartDrawer } from "@/components/store/cart/cart-drawer";
 import { Footer } from "@/components/store/footer";
 import { Header } from "@/components/store/header";
+import { env } from "@/env";
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
-      <Header />
+    <CartProvider currency={env.STORE_CURRENCY}>
+      <Header cartSlot={<CartButton />} />
       <main id="main" className="flex-1">
         {children}
       </main>
       <Footer />
-    </>
+      <CartDrawer />
+    </CartProvider>
   );
 }

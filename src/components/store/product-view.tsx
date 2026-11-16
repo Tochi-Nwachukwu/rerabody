@@ -6,6 +6,7 @@ import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+import { AddToCartButton } from "./cart/add-to-cart-button";
 import { Price } from "./price";
 import { type GalleryImage, ProductGallery } from "./product-gallery";
 
@@ -186,6 +187,7 @@ export function ProductView({
                 <Plus />
               </Button>
             </div>
+            <AddToCartButton variantId={variant.id} quantity={quantity} />
           </div>
         ) : null}
       </div>

@@ -78,3 +78,27 @@ Choices made where the build plan was silent or a dependency forced a change. Ne
 | Variant in URL | The selected variant is written to `?variant=` with `history.replaceState` | Shareable links to a specific size or colour |
 | Gallery zoom | Hover zoom (mouse only) on the main image, plus a full-screen view with previous and next | Works with touch and keyboard |
 | Lighthouse (mobile, e2e build) | S2: accessibility 98, SEO 100. S5: accessibility 96, SEO 91. Flagged tab contrast and heading order were fixed afterwards | Phase 3 check (target 90) |
+
+## Phase 4
+
+| Topic | Decision | Why |
+| --- | --- | --- |
+| Routes | S8 `/cart`, S9 `/checkout`, S11 `/checkout/success`, S12 `/checkout/cancelled`, G3 cart drawer. Test page `/checkout/fake-pay` (404 unless `PAYMENT_PROVIDER=fake`) | No screen map |
+| Guest cart | `rb_cart` cookie (random token, httpOnly, 60 days). Signed-in users have one cart by `userId` | Plan |
+| Cart merge | Better Auth `session.create.after` hook reads the cart cookie and merges: quantities add up capped at stock, guest coupon carries over if the account has none, guest cart deleted | "Merge into the account cart on login" |
+| Price change flag | New `CartItem.lastSeenPrice`. When the variant price differs on load, a notice is shown once and the snapshot updated | "Flags any line that changed" needs the old price |
+| Cart revalidation | On every load: unpublished or inactive lines are removed, quantities capped at stock (max 20 per line), invalid coupons removed, each with a notice | Plan |
+| Coupon minimum spend | Compared with the cart subtotal before discount. Restrictions limit which lines are discounted, not the minimum | Common convention |
+| Coupon usage counting | Redemptions are written when the order is paid. Pending orders do not reserve a use | Avoids locking codes on abandoned payments |
+| Stock at checkout | Not reserved. Checked when the order is created; rule 3 handles a sell-out between checkout and payment | Plan |
+| Order numbers | `RB-` + Postgres sequence `order_number_seq` starting at 10001. Tickets get `ticket_number_seq` (T-1001) | Human readable and race free |
+| `Order.sourceCartId` | New field. The webhook removes only the purchased variants from that cart | The plan says the cart is cleared in the payment transaction; the order needs to know which cart |
+| Guest access token | Every order gets a random token; only the SHA-256 hash is stored. It is in the success and cancel URLs and (Phase 5) in email links | Rule 12 |
+| Idempotency insert | The `ProcessedWebhookEvent` insert is the first statement inside the same transaction as the handling | A duplicate hits the unique constraint and does nothing (rule 2); a failed handling rolls back the insert so the provider's retry is processed |
+| Failed payments | Only `checkout.session.async_payment_failed` cancels. A declined card inside Stripe Checkout does not, because the customer can retry on the same page. Expired sessions cancel | Avoids cancelling orders that are then paid |
+| Payment after cancel | Marked SUCCEEDED and the order flagged for manual review. Not moved (CANCELLED to PAID is not allowed) and not auto-refunded | Rules 3 and 4 |
+| Amount mismatch | If the provider total differs from the order total, the order is still PAID but flagged | Defence in depth |
+| Stripe discount | A one-off Stripe coupon (`amount_off`, max one redemption) per discounted order, so Stripe's total equals ours exactly | Line-level discount rounding could differ |
+| Stripe session | 60 minute expiry, idempotency keys per order, order id in metadata and `client_reference_id`, API version pinned by stripe-node 23 (`2026-10-28.endive`) | |
+| Fake provider | `PAYMENT_PROVIDER=fake`: checkout goes to `/checkout/fake-pay`; its buttons sign an event with HMAC and feed it to the same `handlePaymentEvent` the Stripe webhook uses | Tests and local work exercise the real pipeline |
+| Success page | Reads the order (owner session or guest token), shows status and polls with `router.refresh()` every 2 seconds for up to 90 seconds. Never writes | Rule 1 |

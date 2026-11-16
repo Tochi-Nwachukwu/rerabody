@@ -22,6 +22,8 @@ const serverSchema = z.object({
     .regex(/^[A-Z]{3}$/, "STORE_CURRENCY must be an ISO 4217 code such as GBP"),
   STRIPE_SECRET_KEY: nonEmpty,
   STRIPE_WEBHOOK_SECRET: nonEmpty,
+  // "fake" uses a built-in test payment page instead of Stripe (local work and tests only).
+  PAYMENT_PROVIDER: z.enum(["stripe", "fake"]).default("stripe"),
   R2_ACCOUNT_ID: nonEmpty,
   R2_ACCESS_KEY_ID: nonEmpty,
   R2_SECRET_ACCESS_KEY: nonEmpty,

@@ -473,6 +473,8 @@ model CartItem {
   cartId    String
   variantId String
   quantity  Int
+  // Price the customer last saw, so a changed price can be flagged on the next cart load.
+  lastSeenPrice Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -508,6 +510,8 @@ model Order {
   needsManualReview    Boolean     @default(false)
   manualReviewReason   String?
   paidAt               DateTime?
+  // Cart the order was created from, so the paid lines can be cleared from it. No FK: carts are short-lived.
+  sourceCartId         String?
   createdAt            DateTime    @default(now())
   updatedAt            DateTime    @updatedAt
 
