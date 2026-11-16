@@ -102,7 +102,7 @@ test("a refund from the admin restocks when ticked", async ({ page }) => {
   await page.getByRole("button", { name: "Refund" }).click();
   await page
     .getByRole("dialog")
-    .getByRole("button", { name: /^Refund £/ })
+    .getByRole("button", { name: /^Refund \$/ })
     .click();
   await expect
     .poll(

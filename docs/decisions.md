@@ -23,7 +23,7 @@ Choices made where the build plan was silent or a dependency forced a change. Ne
 | Role defaults | Owner: all. Manager: everything except `orders.refund`, `staff.manage`, `roles.manage`, `settings.manage`, `audit.read`. Inventory staff: products, inventory, `media.upload`. Fulfilment staff: `orders.read`, `orders.update`. Content editor: `content.manage`, `media.upload`, `media.delete` | build-plan.md lists refunds, staff, roles and settings as Owner-only. Manager gets `support.manage` with customers. Inventory staff need uploads for product images |
 | `Role.isSystem` | Only Owner is seeded as a system role | Rule 14 protects Owner. Other roles stay editable in A26 |
 | Caching | `cacheComponents: true` (Next.js 16 Cache Components) | Tag revalidation (`cacheTag`, `revalidateTag`) is the current Next.js caching model for the tag scheme in section 4 |
-| Placeholder currency | Local `.env` uses `GBP` | Placeholder only. Real currency is an open question for the client |
+| Store currency | `STORE_CURRENCY=USD`, prices formatted with the `en-US` locale (`$19.99`) | The client asked for USD. Seed prices are still placeholders |
 | Section data shapes | Seeded homepage section `data` is provisional | The Zod schema per section type is written in Phase 6. The seed will be aligned then |
 | Owner credential | Seed writes the owner's Better Auth `credential` account with `hashPassword` from `better-auth/crypto`, `accountId` = user id | Same shape as Better Auth sign-up, so the owner can sign in once auth is wired in Phase 1 |
 

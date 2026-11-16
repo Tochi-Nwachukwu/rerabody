@@ -12,7 +12,7 @@ export function minorUnitDigits(currency: string): number {
   );
 }
 
-export function formatMoney(amountMinor: number, currency: string, locale = "en-GB"): string {
+export function formatMoney(amountMinor: number, currency: string, locale = "en-US"): string {
   if (!Number.isInteger(amountMinor)) {
     throw new Error(`formatMoney expects an integer amount in minor units, got ${amountMinor}`);
   }

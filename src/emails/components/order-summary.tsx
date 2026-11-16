@@ -98,7 +98,7 @@ export function OrderSummary({ order }: { order: EmailOrder }) {
 
 export const sampleOrder: EmailOrder = {
   number: "RB-10001",
-  currency: "GBP",
+  currency: "USD",
   items: [
     {
       name: "Whipped Shea Body Butter",

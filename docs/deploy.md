@@ -64,7 +64,7 @@ Set these for Production (and Preview with test values). `src/env.ts` refuses to
 | `DIRECT_URL` | Neon direct connection string |
 | `BETTER_AUTH_SECRET` | `openssl rand -base64 32` (keep it stable: it also signs email links) |
 | `NEXT_PUBLIC_APP_URL` | `https://<store domain>` (no trailing slash) |
-| `STORE_CURRENCY` | ISO code, for example `GBP` or `NGN` |
+| `STORE_CURRENCY` | `USD` |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | From step 5 |
 | `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` | From step 3 |
 | `NEXT_PUBLIC_MEDIA_URL` | `https://media.<domain>` |
