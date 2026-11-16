@@ -39,9 +39,17 @@ export const settingSchemas = {
       .max(20)
       .default([]),
   }),
+  // Chat widget embed, switched on without a deploy. Only known providers, so the CSP can allow them.
   chatWidget: z.object({
     enabled: z.boolean().default(false),
-    script: z.string().max(5000).default(""),
+    provider: z.enum(["tawk", "crisp"]).default("tawk"),
+    // Tawk.to: "propertyId/widgetId". Crisp: the website id.
+    siteId: z
+      .string()
+      .trim()
+      .max(100)
+      .regex(/^[A-Za-z0-9/_-]*$/, "Use the id from the provider's embed code")
+      .default(""),
   }),
 } as const;
 

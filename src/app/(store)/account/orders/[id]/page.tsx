@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { requireUser } from "@/server/auth/session";
 import { db } from "@/server/db";
 import { getSiteSettings } from "@/server/queries/settings";
+import { reviewLink } from "@/server/notifications/orders";
 import { getOrderView } from "@/server/services/account";
 
 export const metadata: Metadata = { title: "Order" };
@@ -35,6 +36,27 @@ async function Order({ params }: { params: PageProps<"/account/orders/[id]">["pa
         </Link>
       </div>
       <OrderView order={order} tracking={settings.tracking} />
+      {order.status === "DELIVERED" ? (
+        <section aria-labelledby="review" className="rounded-xl border p-5">
+          <h2 id="review" className="font-heading mb-2 text-2xl">
+            Tell us what you think
+          </h2>
+          <ul className="flex flex-col gap-1 text-sm">
+            {order.items
+              .filter(
+                (i, idx, all) =>
+                  i.productId && all.findIndex((x) => x.productId === i.productId) === idx,
+              )
+              .map((i) => (
+                <li key={i.id}>
+                  <Link href={reviewLink(i.id)} className="underline underline-offset-4">
+                    Review {i.productName}
+                  </Link>
+                </li>
+              ))}
+          </ul>
+        </section>
+      ) : null}
     </div>
   );
 }

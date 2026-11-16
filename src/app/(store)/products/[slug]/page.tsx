@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { RichText, hasRichText, richTextToPlain } from "@/components/rich-text";
 import { ProductGrid } from "@/components/store/product-card";
 import { ProductView } from "@/components/store/product-view";
+import { ReviewsBlock } from "@/components/store/reviews/reviews-block";
 import { Stars } from "@/components/store/stars";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -134,7 +135,15 @@ async function Product({ params, searchParams }: PageProps<"/products/[slug]">) 
           ))}
         </Tabs>
       ) : null}
-      <div id="reviews" />
+      {!preview ? (
+        <Suspense fallback={<Skeleton className="mt-16 h-40 w-full" />}>
+          <ReviewsBlock
+            productId={product.id}
+            average={product.ratingAverage}
+            count={product.ratingCount}
+          />
+        </Suspense>
+      ) : null}
       {!preview ? <ProductJsonLd product={product} currency={currency} /> : null}
       <Related product={product} currency={currency} />
     </div>

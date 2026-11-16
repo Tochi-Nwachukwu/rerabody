@@ -9,7 +9,9 @@ import { env } from "@/env";
 import { db } from "@/server/db";
 import { readCartCookie } from "@/server/cart-cookie";
 import { sendEmail } from "@/server/email";
+import { TAGS, expireTags } from "@/server/cache-tags";
 import { mergeGuestCart } from "@/server/services/cart";
+import { removeReviewsForUser } from "@/server/services/reviews";
 
 export const auth = betterAuth({
   baseURL: env.NEXT_PUBLIC_APP_URL,
@@ -29,6 +31,15 @@ export const auth = betterAuth({
           throw new APIError("FORBIDDEN", {
             message: "Staff accounts are removed by the store owner.",
           });
+        // Reviews are removed with the account; fix the ratings they counted towards.
+        const productIds = await removeReviewsForUser(db, user.id);
+        if (productIds.length) {
+          expireTags(
+            TAGS.products,
+            TAGS.featuredReviews,
+            ...productIds.flatMap((id) => [TAGS.product(id), TAGS.reviews(id)]),
+          );
+        }
       },
     },
     additionalFields: {

@@ -542,7 +542,7 @@ async function seedSettings() {
     notifications: { adminAlertEmail: "orders-alerts@example.com", defaultLowStockThreshold: 5 },
     seo: { defaultTitle: "Rera Body", defaultDescription: "Placeholder store description." },
     tracking: { carriers: [] },
-    chatWidget: { enabled: false, script: "" },
+    chatWidget: { enabled: false, provider: "tawk", siteId: "" },
   };
 
   for (const [key, value] of Object.entries(settings)) {

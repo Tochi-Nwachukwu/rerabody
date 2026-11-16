@@ -87,6 +87,7 @@ export function SettingsForms({
   const [notifications, setNotifications] = useState(settings.notifications);
   const [seo, setSeo] = useState(settings.seo);
   const [carriers, setCarriers] = useState(settings.tracking.carriers);
+  const [chat, setChat] = useState(settings.chatWidget);
   const [editing, setEditing] = useState<Method | null>(null);
 
   function save(parts: { key: keyof SiteSettings; value: unknown }[], message = "Settings saved") {
@@ -108,6 +109,7 @@ export function SettingsForms({
         <TabsTrigger value="shipping">Shipping</TabsTrigger>
         <TabsTrigger value="notifications">Notifications</TabsTrigger>
         <TabsTrigger value="seo">SEO</TabsTrigger>
+        <TabsTrigger value="chat">Chat</TabsTrigger>
       </TabsList>
       {error ? (
         <div className="mb-4 max-w-2xl">
@@ -489,6 +491,55 @@ export function SettingsForms({
             className="self-start"
             disabled={pending}
             onClick={() => save([{ key: "seo", value: seo }])}
+          >
+            Save
+          </Button>
+        </Panel>
+      </TabsContent>
+      <TabsContent value="chat" className="flex flex-col gap-6">
+        <Panel
+          title="Chat widget"
+          description="Shows a live chat bubble on the storefront. Paste the id from your Tawk.to or Crisp account."
+        >
+          <Field>
+            <FieldLabel htmlFor="chat-provider">Provider</FieldLabel>
+            <select
+              id="chat-provider"
+              className="bg-background h-8 rounded-lg border px-2 text-sm"
+              value={chat.provider}
+              onChange={(e) =>
+                setChat({ ...chat, provider: e.target.value as typeof chat.provider })
+              }
+            >
+              <option value="tawk">Tawk.to</option>
+              <option value="crisp">Crisp</option>
+            </select>
+          </Field>
+          <TextField
+            id="chat-id"
+            label={
+              chat.provider === "tawk" ? "Property and widget id (property/widget)" : "Website id"
+            }
+            description={
+              chat.provider === "tawk"
+                ? "From the embed code: https://embed.tawk.to/THIS-PART"
+                : "From Crisp settings, Website ID"
+            }
+            value={chat.siteId}
+            onChange={(e) => setChat({ ...chat, siteId: e.target.value.trim() })}
+          />
+          <Field orientation="horizontal">
+            <Switch
+              id="chat-on"
+              checked={chat.enabled}
+              onCheckedChange={(v) => setChat({ ...chat, enabled: v })}
+            />
+            <FieldLabel htmlFor="chat-on">Show the chat widget</FieldLabel>
+          </Field>
+          <Button
+            className="self-start"
+            disabled={pending}
+            onClick={() => save([{ key: "chatWidget", value: chat }])}
           >
             Save
           </Button>

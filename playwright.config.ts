@@ -35,8 +35,8 @@ export default defineConfig({
     { name: "desktop", use: { ...devices["Desktop Chrome"] }, testMatch: /smoke\.spec\.ts/ },
   ],
   webServer: {
-    // Migrate and seed the e2e database before building, since the build prerenders from it.
-    command: `pnpm exec prisma migrate deploy && pnpm exec prisma db seed && pnpm build && pnpm start --port ${PORT}`,
+    // Reset, migrate and seed the e2e database before building, since the build prerenders from it.
+    command: `pnpm exec prisma migrate deploy && pnpm exec tsx tests/e2e/reset-db.ts && pnpm exec prisma db seed && pnpm build && pnpm start --port ${PORT}`,
     url: baseURL,
     reuseExistingServer: false,
     timeout: 300_000,

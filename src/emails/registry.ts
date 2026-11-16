@@ -13,6 +13,7 @@ import {
 import NewsletterWelcome from "./newsletter-welcome";
 import PasswordReset from "./password-reset";
 import SettingsTest from "./settings-test";
+import { TicketReceived, TicketReply } from "./ticket-emails";
 import VerifyEmail from "./verify-email";
 import Welcome from "./welcome";
 
@@ -88,6 +89,19 @@ export const emailTemplates = {
   "settings-test": define({
     component: SettingsTest,
     subject: () => "Test email from your store",
+    stream: "orders",
+  }),
+  "ticket-received": define({
+    component: TicketReceived,
+    subject: (p) =>
+      p.forAdmin
+        ? `New message (${p.number}): ${p.subject}`
+        : `We received your message (${p.number})`,
+    stream: "orders",
+  }),
+  "ticket-reply": define({
+    component: TicketReply,
+    subject: (p) => `Re: your message (${p.number})`,
     stream: "orders",
   }),
   "order-refunded": define({

@@ -140,3 +140,22 @@ Choices made where the build plan was silent or a dependency forced a change. Ne
 | Newsletter | Signup always returns the same message (rule 13); welcome email deduped by `newsletter:{id}`; re-subscribing an unsubscribed address reactivates it. Marketing sends are suppressed for unsubscribed or bounced addresses | Plan |
 | Unsubscribe | Signed link (HMAC of the subscriber id). The page needs one button press, so link scanners cannot unsubscribe people by fetching the URL | One click from any marketing email |
 | e2e database | The Playwright web server command migrates and seeds the e2e database before building, because the build prerenders from it | Playwright starts the web server before global setup |
+
+## Phase 7
+
+| Topic | Decision | Why |
+| --- | --- | --- |
+| Routes | S23 `/reviews/new`, S28 `/contact`, A12 `/admin/customers`, A13 `/admin/customers/[id]`, A14 `/admin/reviews`, A15 `/admin/coupons`, A16 `/admin/coupons/[id]` (`new` creates), A17 `/admin/support`, A18 `/admin/support/[id]` | No screen map |
+| Review identity | Reviews need an account (`Review.userId` is required). The signed link from the delivered email opens S23; guests are asked to sign in or register with the order email. A guest order matches a user only when the email matches and is verified | Rule 9: only the buyer. A verified email proves ownership |
+| Review rule enforcement | `reviewEligibility` checks buyer, DELIVERED status and an existing review, inside `submitReview`; the unique index on `orderItemId` catches a race | Calling the action directly cannot bypass it |
+| Review states | Approve (published), reject (with an internal reason), unpublish (back to pending), delete, feature on homepage (approved only). Ratings recalculate on every change except featuring | Rule 9 |
+| Review links in S20 | Delivered orders in the account show "Review" links (same signed links) | A second way in besides the email |
+| Account deletion | Before deletion, the user's reviews are removed and affected ratings recalculated | Reviews cascade with the user; ratings must stay correct |
+| Coupon revenue | Sum of totals of orders that used the code, excluding cancelled and refunded orders | "Revenue per code" |
+| Customers | A12 lists registered accounts only (guests appear in Orders). Spend counts paid, processing, shipped, out for delivery and delivered orders. `customers.update` can edit name and phone and deactivate (which signs the customer out everywhere) | Simple and useful |
+| Ticket numbers | `T-` + Postgres sequence starting 1001 | Readable references |
+| Ticket emails | `ticket-received` goes to the customer (`ticket:{id}`) and to the admin alert address (`ticket:{id}:admin`, since one key cannot cover two sends). Replies use `ticket-msg:{messageId}` and set Reply-To to the store contact email | Section 11 keys, adapted for two recipients |
+| Customer replies | Replies a customer sends by email land in the store's normal inbox, not in the ticket thread | No inbound email processing in the plan |
+| Contact spam | Hidden honeypot field; rate limiting follows in Phase 9 | Cheap first defence |
+| Chat widget | `chatWidget` setting with provider (Tawk.to or Crisp), site id and an on switch, loaded with `next/script` lazily | Switched on without a deploy; known providers keep the CSP precise |
+| e2e isolation | The Playwright web server command truncates the e2e database (name must contain "e2e" or "test"), migrates and seeds before building | Runs are repeatable; data no longer accumulates |
