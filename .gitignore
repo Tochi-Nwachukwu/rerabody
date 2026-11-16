@@ -52,3 +52,6 @@ next-env.d.ts
 
 # local email outbox (EMAIL_TRANSPORT=log)
 /.emails/
+
+# local uploads (STORAGE_DRIVER=local)
+/.uploads/

@@ -26,6 +26,8 @@ const serverSchema = z.object({
   R2_ACCESS_KEY_ID: nonEmpty,
   R2_SECRET_ACCESS_KEY: nonEmpty,
   R2_BUCKET: nonEmpty,
+  // "local" stores uploads in .uploads/ and serves them from /api/uploads/local (dev and tests only).
+  STORAGE_DRIVER: z.enum(["r2", "local"]).default("r2"),
   RESEND_API_KEY: nonEmpty,
   RESEND_WEBHOOK_SECRET: nonEmpty,
   EMAIL_FROM_ORDERS: nonEmpty,
