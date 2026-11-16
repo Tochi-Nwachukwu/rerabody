@@ -62,3 +62,19 @@ Choices made where the build plan was silent or a dependency forced a change. Ne
 | Inventory adjust | Add, remove or set to. Restock must add, damage must remove, correction either way. "Set to" uses an optimistic check against the stock read, so a sale in between is not overwritten | Rule 3 spirit: stock never negative, no lost updates |
 | Unique errors | With Prisma 7 driver adapters the constraint name is in `meta.driverAdapterError`; `uniqueViolationOn()` checks the serialised meta | `meta.target` is no longer set |
 | Cache invalidation | `expireTags()` calls `revalidateTag(tag, { expire: 0 })` | Works in both Server Actions and route handlers (webhooks) |
+
+## Phase 3
+
+| Topic | Decision | Why |
+| --- | --- | --- |
+| Storefront routes | S2 `/shop`, S3 `/collections`, S4 `/collections/[slug]`, S5 `/products/[slug]`, S6 `/search`, S7 `/offers`, S31 not found | Matches the site map in build-plan.md |
+| Catalogue reads | One cached list of published product cards (`"use cache"`, tag `products`) is filtered, sorted and paged in memory for shop, collections, search results and offers | The catalogue is small (tens of products). One cache entry, invalidated by any product change, keeps every listing consistent |
+| Shop URL state | `category`, `sort`, `min`, `max` (major units), `stock=1`, `sale=1`, `page` | Shareable, back-button friendly |
+| Featured sort | Shop: in-stock first, then best selling. Collection: the order set in A7 | Owner controls collection order |
+| Search ranking | Full-text match (name weighted A, description B) ranks first; otherwise `word_similarity(query, name) >= 0.4` catches misspellings; `ILIKE` as a fallback | Tested against the seeded names: "lavendr buter", "satn slip", "nightdres" all hit |
+| Draft preview | `/products/[slug]?preview=1` renders drafts for staff with `products.read`, with a banner, uncached | "Saves as draft, previews, then publishes" |
+| Not-found status | Missing products inside streamed (partial prerender) pages render S31 with a `noindex` robots tag but HTTP 200 | Next.js cannot change the status once the static shell has streamed. Unknown routes still return 404 |
+| Metadata streaming | Left at the Next.js default: search engine bots get blocking metadata; other clients (including Lighthouse) get streamed metadata | Lighthouse may report a missing meta description that Googlebot does see |
+| Variant in URL | The selected variant is written to `?variant=` with `history.replaceState` | Shareable links to a specific size or colour |
+| Gallery zoom | Hover zoom (mouse only) on the main image, plus a full-screen view with previous and next | Works with touch and keyboard |
+| Lighthouse (mobile, e2e build) | S2: accessibility 98, SEO 100. S5: accessibility 96, SEO 91. Flagged tab contrast and heading order were fixed afterwards | Phase 3 check (target 90) |

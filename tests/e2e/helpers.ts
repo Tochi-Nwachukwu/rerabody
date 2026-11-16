@@ -3,6 +3,13 @@ import path from "node:path";
 
 import { expect, type Page } from "@playwright/test";
 
+import { sql } from "./db";
+
+/** The suite signs in many times; reset the auth rate limiter in the e2e database between sign-ins. */
+export async function resetRateLimits() {
+  await sql(`DELETE FROM "RateLimit"`);
+}
+
 type LoggedEmail = { to: string; subject: string; html: string; text: string };
 
 export function readOutbox(): LoggedEmail[] {
@@ -43,6 +50,7 @@ export const uniqueEmail = (prefix: string) =>
   `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1e4)}@example.test`;
 
 export async function signInAsOwner(page: Page) {
+  await resetRateLimits();
   await page.goto("/admin/login");
   await page.getByLabel("Email").fill(process.env.SEED_OWNER_EMAIL!);
   await page.getByLabel("Password", { exact: true }).fill(process.env.SEED_OWNER_PASSWORD!);
@@ -51,6 +59,7 @@ export async function signInAsOwner(page: Page) {
 }
 
 export async function registerAndVerify(page: Page, email: string, password = "correct-horse-1") {
+  await resetRateLimits();
   await page.goto("/register");
   await page.getByLabel("Name").fill("Test Customer");
   await page.getByLabel("Email").fill(email);
