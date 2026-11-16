@@ -186,6 +186,15 @@ model Verification {
   @@index([identifier])
 }
 
+// Better Auth rate limit counters. Also used by src/server/rate-limit.ts for app forms.
+// No createdAt/updatedAt: Better Auth writes this table directly with its own fields.
+model RateLimit {
+  id          String @id @default(cuid())
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+}
+
 model Role {
   id        String   @id @default(cuid())
   name      String   @unique

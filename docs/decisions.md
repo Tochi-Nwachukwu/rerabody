@@ -26,3 +26,19 @@ Choices made where the build plan was silent or a dependency forced a change. Ne
 | Placeholder currency | Local `.env` uses `GBP` | Placeholder only. Real currency is an open question for the client |
 | Section data shapes | Seeded homepage section `data` is provisional | The Zod schema per section type is written in Phase 6. The seed will be aligned then |
 | Owner credential | Seed writes the owner's Better Auth `credential` account with `hashPassword` from `better-auth/crypto`, `accountId` = user id | Same shape as Better Auth sign-up, so the owner can sign in once auth is wired in Phase 1 |
+
+## Phase 1
+
+| Topic | Decision | Why |
+| --- | --- | --- |
+| Screen map | `docs/screen-map.md` was not supplied. Screens follow the flows in `build-plan.md`. Routes chosen: A1 `/admin/login`, A2 `/admin/accept-invite`, A3 `/admin`, S13 `/login`, S14 `/register`, S15 `/verify-email`, S16 `/forgot-password`, S17 `/reset-password` | Needed to build the screens. Easy to rename when the screen map arrives |
+| Email transport | `EMAIL_TRANSPORT=log` writes emails to `.emails/outbox.jsonl` instead of calling Resend. Default is `resend` | Local work and Playwright need to read verification links without a Resend account |
+| Email retries | If a dedupe key's earlier send FAILED, the next call with that key claims the row and retries. Any other existing status is a duplicate | build-plan.md asks to "retry failures" without breaking rule 6 |
+| Auth emails not awaited | Verification and reset sends are fired without `await` | Better Auth guidance: avoids timing differences that reveal whether an account exists (rule 13) |
+| Rate limiting | Better Auth's built-in limiter with database storage (`RateLimit` table). Sign in and sign up 5 per minute, reset and verification resend 3 per minute | Phase 9 asks for it; the auth routes are covered now because the limiter is part of the auth config |
+| Deactivated users | Blocked from creating a session (Better Auth session hook) and treated as signed out by `getSession` | Covers existing sessions too |
+| Sign-up role | A `user.create.before` hook forces `roleId = null` and `status = ACTIVE` | Sign-up can never create staff |
+| Admin refusal | A signed-in customer at `/admin` is sent to `/admin/login?error=no-access`, which offers sign out | "A customer account is refused at `/admin`" |
+| Page permission refusal | Admin pages call `requirePagePermission`, which redirects to the dashboard with a notice | Actions use `requirePermission`, which throws `AuthError` |
+| Test databases | `TEST_DATABASE_URL` for Vitest (truncated between tests, files run one at a time) and `E2E_DATABASE_URL` for Playwright (migrated and seeded before each run) | Integration tests need a real Postgres for unique constraints and conditional writes |
+| Prisma generate | `db:migrate:dev` runs `prisma generate` after migrating | Prisma 7 `migrate dev` no longer regenerates the client |

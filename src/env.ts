@@ -30,6 +30,8 @@ const serverSchema = z.object({
   RESEND_WEBHOOK_SECRET: nonEmpty,
   EMAIL_FROM_ORDERS: nonEmpty,
   EMAIL_FROM_MARKETING: nonEmpty,
+  // "log" writes emails to .emails/outbox.jsonl instead of calling Resend (local work and tests).
+  EMAIL_TRANSPORT: z.enum(["resend", "log"]).default("resend"),
   CRON_SECRET: z.string().min(16, "CRON_SECRET must be at least 16 characters"),
   SEED_OWNER_EMAIL: z.email(),
   SEED_OWNER_PASSWORD: z.string().min(12, "SEED_OWNER_PASSWORD must be at least 12 characters"),
