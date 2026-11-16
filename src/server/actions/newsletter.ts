@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { emailField } from "@/lib/schemas/auth";
 import { db } from "@/server/db";
+import { enforceRateLimit } from "@/server/rate-limit";
 import { sendEmail } from "@/server/email";
 import { UserError } from "@/server/errors";
 import { unsubscribeUrl } from "@/server/notifications/newsletter";
@@ -14,6 +15,7 @@ import { publicAction } from "./safe-action";
 
 /** Footer and homepage signup. Same response whether or not the address was already subscribed (rule 13). */
 export const subscribeAction = publicAction(z.object({ email: emailField }), async (input) => {
+  await enforceRateLimit("newsletter");
   const { subscriber } = await subscribe(db, input.email);
   await sendEmail({
     template: "newsletter-welcome",

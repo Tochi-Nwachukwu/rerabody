@@ -174,3 +174,16 @@ Choices made where the build plan was silent or a dependency forced a change. Ne
 | Charts | CSS bars with a data table alternative, no chart library | Accessible and light |
 | Low stock alert | Daily Vercel cron (07:00 UTC) calls `/api/cron/low-stock` with `Authorization: Bearer CRON_SECRET`; one email per variant per day (`low-stock:{variantId}:{date}`) to the admin alert address | Section 11 key |
 | Action permission test | The real Server Actions are run in Vitest with the session and database modules pointed at the test database, proving a Fulfilment user is refused by `saveProductAction` and allowed `updateOrderStatusAction` | Phase 8 check |
+
+## Phase 9
+
+| Topic | Decision | Why |
+| --- | --- | --- |
+| App rate limits | Fixed-window counters in the `RateLimit` table (one atomic upsert, keys prefixed `app:`), per client IP: contact 5 per 10 min, newsletter 5 per 10 min, coupon apply 10 per min, review submit 5 per 10 min per user, order lookup 10 per 10 min. Login, register, reset and verification are limited by Better Auth | Works across serverless instances without Redis |
+| CSP | `default-src 'self'`, `frame-ancestors 'none'`, `object-src 'none'`, `form-action 'self'`; images from the R2 media domain; uploads to the R2 S3 endpoint; Tawk.to and Crisp for the chat widget. `script-src` keeps `'unsafe-inline'` | Pages are statically prerendered; a nonce would force every page to render per request and lose caching |
+| HTTPS-only headers | HSTS and `upgrade-insecure-requests` are sent only when `NEXT_PUBLIC_APP_URL` is https | Local and e2e builds run on http://localhost |
+| Stripe and CSP | No Stripe.js is loaded; checkout is a redirect to Stripe's hosted page, which CSP does not restrict | Hosted Checkout |
+| Error states | `error.tsx` for the store, auth and admin groups, `global-error.tsx`, admin `not-found.tsx` and `loading.tsx`, account `loading.tsx`. Lists already have empty states | Plan |
+| Accessibility | axe-core runs in Playwright on 15 storefront pages and 10 admin pages (WCAG 2.2 AA rules) with zero violations. The destructive colour token was darkened for contrast | Repeatable a11y check |
+| Public API routes | `/api/auth/*` (Better Auth) and `/api/search/suggest` are public by design; every other `/api` route needs a signature, the cron secret or a staff session, and `/admin` needs a staff session. Covered by `coupon-and-access.spec.ts` | Phase 9 check |
+| Final Lighthouse (mobile, production build) | S2: performance 90, accessibility 100, best practices 100, SEO 100. S5: 86, 100, 100, 100 | Placeholder content, no real images yet |

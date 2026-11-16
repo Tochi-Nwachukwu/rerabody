@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { TAGS, expireTags } from "@/server/cache-tags";
 import { db } from "@/server/db";
+import { enforceRateLimit } from "@/server/rate-limit";
 import { UserError } from "@/server/errors";
 import { moderateReview, submitReview } from "@/server/services/reviews";
 
@@ -23,6 +24,7 @@ export const submitReviewAction = userAction(
     body: z.string().trim().min(10, "Write at least a sentence (10 characters)").max(3000),
   }),
   async (input, user) => {
+    await enforceRateLimit("review", user.id);
     const full = await db.user.findUnique({
       where: { id: user.id },
       select: { id: true, email: true, emailVerified: true },

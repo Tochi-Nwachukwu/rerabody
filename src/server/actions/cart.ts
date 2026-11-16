@@ -5,6 +5,7 @@ import { z } from "zod";
 import { addToCartSchema, cartQuantitySchema, couponCodeSchema } from "@/lib/schemas/checkout";
 import { formatStoreMoney, getCartIdentity } from "@/server/cart-session";
 import { db } from "@/server/db";
+import { enforceRateLimit } from "@/server/rate-limit";
 import {
   type CartView,
   addToCart,
@@ -45,6 +46,7 @@ export const removeCartItemAction = publicAction(
 );
 
 export const applyCouponAction = publicAction(couponCodeSchema, async (input) => {
+  await enforceRateLimit("coupon");
   const id = await getCartIdentity();
   await applyCoupon(db, id, {
     code: input.code,

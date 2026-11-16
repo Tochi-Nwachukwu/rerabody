@@ -5,6 +5,7 @@ import { z } from "zod";
 import { contactSchema } from "@/lib/schemas/contact";
 import { absoluteUrl } from "@/lib/site";
 import { db } from "@/server/db";
+import { enforceRateLimit } from "@/server/rate-limit";
 import { sendEmail } from "@/server/email";
 import { getSiteSettings } from "@/server/queries/settings";
 import { createTicket, replyToTicket, setTicketStatus } from "@/server/services/support";
@@ -13,6 +14,7 @@ import { adminAction, publicAction } from "./safe-action";
 
 /** S28 contact form: opens a ticket and emails the customer and the admin. */
 export const submitContactAction = publicAction(contactSchema, async (input) => {
+  await enforceRateLimit("contact");
   const ticket = await createTicket(db, input);
   const settings = await getSiteSettings();
   const props = {

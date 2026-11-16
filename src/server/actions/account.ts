@@ -5,6 +5,7 @@ import { z } from "zod";
 import { emailField } from "@/lib/schemas/auth";
 import { addressSchema } from "@/lib/schemas/checkout";
 import { db } from "@/server/db";
+import { enforceRateLimit } from "@/server/rate-limit";
 import { UserError } from "@/server/errors";
 import {
   deleteAddress,
@@ -46,6 +47,7 @@ export const updateProfileAction = userAction(
 export const findOrderAction = publicAction(
   z.object({ number: z.string().trim().min(3).max(30), email: emailField }),
   async (input) => {
+    await enforceRateLimit("orderLookup");
     const id = await findOrderByNumberAndEmail(db, input.number, input.email);
     if (!id) throw new UserError("We could not find an order with that number and email.");
     return {
