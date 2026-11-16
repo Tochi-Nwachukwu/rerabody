@@ -62,3 +62,10 @@ export async function registerAndVerify(page: Page, email: string, password = "c
   await page.goto(firstLink(mail, "verify-email"));
   await expect(page.getByText("Your email is confirmed")).toBeVisible();
 }
+
+/** A tiny valid PNG, so uploads go through the real presign and storage path. */
+export function pngFile(name: string) {
+  const base64 =
+    "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGP4z8DAwMDAxMDAwMDAAAANHQEDK+mmyAAAAABJRU5ErkJggg==";
+  return { name, mimeType: "image/png", buffer: Buffer.from(base64, "base64") };
+}

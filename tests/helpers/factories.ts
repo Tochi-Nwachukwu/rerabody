@@ -37,3 +37,47 @@ export async function createUser(
     },
   });
 }
+
+export async function createProduct(
+  opts: {
+    status?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+    variants?: {
+      sku?: string;
+      price?: number;
+      stock?: number;
+      optionValues?: Record<string, string>;
+    }[];
+    name?: string;
+    categoryId?: string;
+  } = {},
+) {
+  const name = opts.name ?? `Product ${uid()}`;
+  return testDb.product.create({
+    data: {
+      name,
+      slug: uid("p-"),
+      status: opts.status ?? "PUBLISHED",
+      categoryId: opts.categoryId,
+      variants: {
+        create: (opts.variants ?? [{}]).map((v) => ({
+          sku: v.sku ?? uid("SKU").toUpperCase(),
+          price: v.price ?? 1000,
+          stock: v.stock ?? 10,
+          optionValues: v.optionValues ?? {},
+        })),
+      },
+    },
+    include: { variants: true },
+  });
+}
+
+export async function createMedia() {
+  return testDb.media.create({
+    data: {
+      key: `media/2026/01/${crypto.randomUUID()}.jpg`,
+      url: "https://media.test/x.jpg",
+      bytes: 100,
+      mimeType: "image/jpeg",
+    },
+  });
+}

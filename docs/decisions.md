@@ -42,3 +42,23 @@ Choices made where the build plan was silent or a dependency forced a change. Ne
 | Page permission refusal | Admin pages call `requirePagePermission`, which redirects to the dashboard with a notice | Actions use `requirePermission`, which throws `AuthError` |
 | Test databases | `TEST_DATABASE_URL` for Vitest (truncated between tests, files run one at a time) and `E2E_DATABASE_URL` for Playwright (migrated and seeded before each run) | Integration tests need a real Postgres for unique constraints and conditional writes |
 | Prisma generate | `db:migrate:dev` runs `prisma generate` after migrating | Prisma 7 `migrate dev` no longer regenerates the client |
+
+## Phase 2
+
+| Topic | Decision | Why |
+| --- | --- | --- |
+| Admin routes | A4 `/admin/products`, A5 `/admin/products/new` and `/admin/products/[id]`, A6 `/admin/categories`, A7 `/admin/collections`, A8 `/admin/inventory`, A24 `/admin/media` | No screen map |
+| Upload flow | Browser asks `/api/uploads/presign` for a key and signed URL, PUTs the file straight to R2 with progress, then calls `registerUploadAction`, which checks the stored object's size and type with a HEAD request before creating the `Media` row | The presign route cannot see the bytes. The HEAD check enforces the 8 MB cap and type even if the client misbehaves |
+| Signed headers | The R2 presigned PUT signs `content-type` and `content-length` | The client cannot change the type or size after presigning |
+| R2 CORS | The bucket needs a CORS rule allowing PUT from the store origin (documented in deploy.md in Phase 9) | Browser uploads go directly to R2 |
+| Local storage driver | `STORAGE_DRIVER=local` keeps files in `.uploads/`, with an HMAC-signed PUT route and a GET route under `/api/uploads/local` (both 404 unless the driver is local) | Lets the admin and Playwright upload without R2 credentials |
+| Media references | Rule 11 is enforced by `onDelete: Restrict` foreign keys plus a text search of homepage section JSON and site settings | Sections reference media inside JSON, which a foreign key cannot cover |
+| Product editor form | Controlled state validated with the shared `productSchema` before submit; the server validates the same schema. Simpler forms use React Hook Form | The editor has nested, generated variant rows that change with the options |
+| Stock on edit | Saving a product never changes stock on existing variants. New variants take an opening stock recorded as a RESTOCK movement. Other changes go through A8 | Every stock change has a movement row |
+| Removed variants | Deleted if never ordered, otherwise deactivated and their SKU suffixed `-RETIRED-…` | Order history keeps its variant link |
+| Product delete | Allowed only for products never ordered; otherwise archive | "Archiving hides a product without deleting its order history" |
+| Category delete | Refused while products use it | Avoids silently uncategorised products |
+| Variant options | Up to three options, values entered as comma-separated text | Simple and accessible |
+| Inventory adjust | Add, remove or set to. Restock must add, damage must remove, correction either way. "Set to" uses an optimistic check against the stock read, so a sale in between is not overwritten | Rule 3 spirit: stock never negative, no lost updates |
+| Unique errors | With Prisma 7 driver adapters the constraint name is in `meta.driverAdapterError`; `uniqueViolationOn()` checks the serialised meta | `meta.target` is no longer set |
+| Cache invalidation | `expireTags()` calls `revalidateTag(tag, { expire: 0 })` | Works in both Server Actions and route handlers (webhooks) |

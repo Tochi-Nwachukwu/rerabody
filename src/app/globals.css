@@ -130,3 +130,37 @@
     @apply font-sans;
   }
 }
+
+/* Rich text output (Tiptap JSON rendered on the server, and the admin editor). */
+@layer components {
+  .prose-rera {
+    @apply text-[0.95rem] leading-relaxed;
+  }
+  .prose-rera > * + * {
+    @apply mt-3;
+  }
+  .prose-rera h2 {
+    @apply font-heading mt-6 text-2xl font-medium;
+  }
+  .prose-rera h3 {
+    @apply font-heading mt-5 text-xl font-medium;
+  }
+  .prose-rera ul {
+    @apply list-disc pl-5;
+  }
+  .prose-rera ol {
+    @apply list-decimal pl-5;
+  }
+  .prose-rera li > p {
+    @apply m-0;
+  }
+  .prose-rera a {
+    @apply underline underline-offset-4;
+  }
+  .prose-rera blockquote {
+    @apply text-muted-foreground border-l-2 pl-4 italic;
+  }
+  .prose-rera hr {
+    @apply border-border my-6;
+  }
+}

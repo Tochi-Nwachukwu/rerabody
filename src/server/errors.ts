@@ -29,3 +29,13 @@ export function isUniqueConstraintError(error: unknown): boolean {
     (error as { code?: unknown }).code === "P2002"
   );
 }
+
+/**
+ * True when a unique violation involves the given column. With Prisma 7 driver
+ * adapters the constraint name sits in meta.driverAdapterError, not meta.target.
+ */
+export function uniqueViolationOn(error: unknown, column: string): boolean {
+  if (!isUniqueConstraintError(error)) return false;
+  const meta = JSON.stringify((error as { meta?: unknown }).meta ?? {}).toLowerCase();
+  return meta.includes(column.toLowerCase());
+}
