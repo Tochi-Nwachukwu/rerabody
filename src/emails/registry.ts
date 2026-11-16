@@ -13,6 +13,7 @@ import {
 import NewsletterWelcome from "./newsletter-welcome";
 import PasswordReset from "./password-reset";
 import SettingsTest from "./settings-test";
+import { LowStock, StaffInvite } from "./staff-emails";
 import { TicketReceived, TicketReply } from "./ticket-emails";
 import VerifyEmail from "./verify-email";
 import Welcome from "./welcome";
@@ -102,6 +103,17 @@ export const emailTemplates = {
   "ticket-reply": define({
     component: TicketReply,
     subject: (p) => `Re: your message (${p.number})`,
+    stream: "orders",
+  }),
+  "staff-invite": define({
+    component: StaffInvite,
+    subject: () => "You are invited to the Rera Body admin",
+    stream: "orders",
+  }),
+  "low-stock": define({
+    component: LowStock,
+    subject: (p) =>
+      `Low stock: ${p.productName}${p.variantLabel !== "Default" ? ` (${p.variantLabel})` : ""}`,
     stream: "orders",
   }),
   "order-refunded": define({
