@@ -52,7 +52,7 @@ export const uniqueEmail = (prefix: string) =>
 export async function signInAsOwner(page: Page) {
   await resetRateLimits();
   await page.goto("/admin/login");
-  await page.getByLabel("Email").fill(process.env.SEED_OWNER_EMAIL!);
+  await page.getByLabel("Email", { exact: true }).fill(process.env.SEED_OWNER_EMAIL!);
   await page.getByLabel("Password", { exact: true }).fill(process.env.SEED_OWNER_PASSWORD!);
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
@@ -62,7 +62,7 @@ export async function registerAndVerify(page: Page, email: string, password = "c
   await resetRateLimits();
   await page.goto("/register");
   await page.getByLabel("Name").fill("Test Customer");
-  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByLabel("Confirm password").fill(password);
   await page.getByRole("button", { name: "Create account" }).click();
@@ -87,7 +87,7 @@ export async function addProductToCart(page: Page, slug: string) {
 }
 
 export async function fillCheckoutAddress(page: Page, email?: string) {
-  if (email) await page.getByLabel("Email").fill(email);
+  if (email) await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Full name").fill("Test Buyer");
   await page.getByLabel("Phone").fill("07000000000");
   await page.getByLabel("Address line 1").fill("1 Test Street");

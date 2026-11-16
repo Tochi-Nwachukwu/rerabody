@@ -1,9 +1,21 @@
-// Temporary placeholder. The CMS-driven homepage (S1) is built in Phase 6.
-export default function Home() {
-  return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-4 px-4 py-24 text-center">
-      <h1 className="font-heading text-4xl font-semibold">Rera Body</h1>
-      <p className="text-muted-foreground max-w-sm">The store is being built.</p>
-    </main>
-  );
+import type { Metadata } from "next";
+
+import { HomeSections } from "@/components/store/home/sections";
+import { env } from "@/env";
+import { getPublishedHomeSections } from "@/server/queries/home";
+import { getSiteSettings } from "@/server/queries/settings";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { seo } = await getSiteSettings();
+  return {
+    title: { absolute: seo.defaultTitle },
+    description: seo.defaultDescription || undefined,
+    alternates: { canonical: "/" },
+  };
+}
+
+// S1 homepage: published sections only, in order. Cached under the "home" tag.
+export default async function HomePage() {
+  const sections = await getPublishedHomeSections();
+  return <HomeSections sections={sections} currency={env.STORE_CURRENCY} />;
 }

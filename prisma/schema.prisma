@@ -714,6 +714,9 @@ model HomeSection {
   isVisible      Boolean         @default(true)
   data           Json? // published data; null for a section that exists only as a draft
   draftData      Json?
+  // Draft order and visibility, so reordering and hiding only go live on publish.
+  draftPosition  Int?
+  draftIsVisible Boolean?
   isDraftDeleted Boolean         @default(false)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt

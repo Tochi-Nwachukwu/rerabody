@@ -14,6 +14,8 @@ export const TAGS = {
   shipping: "shipping",
   reviews: (productId: string) => `reviews:${productId}`,
   offers: "offers",
+  media: "media",
+  featuredReviews: "featured-reviews",
 } as const;
 
 /** Expires tags immediately. Works in Server Actions and route handlers alike. */

@@ -26,7 +26,7 @@ test("a guest buys a product with the fake provider and sees the order as paid",
 test("cancelling on the payment page keeps the cart", async ({ page }) => {
   await addProductToCart(page, "whipped-shea-body-butter");
   await page.goto("/checkout");
-  await page.getByLabel("Email").fill(uniqueEmail("cancel"));
+  await page.getByLabel("Email", { exact: true }).fill(uniqueEmail("cancel"));
   await page.getByLabel("Full name").fill("Test Buyer");
   await page.getByLabel("Phone").fill("07000000000");
   await page.getByLabel("Address line 1").fill("1 Test Street");

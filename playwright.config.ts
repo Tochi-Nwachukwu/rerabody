@@ -35,7 +35,8 @@ export default defineConfig({
     { name: "desktop", use: { ...devices["Desktop Chrome"] }, testMatch: /smoke\.spec\.ts/ },
   ],
   webServer: {
-    command: `pnpm build && pnpm start --port ${PORT}`,
+    // Migrate and seed the e2e database before building, since the build prerenders from it.
+    command: `pnpm exec prisma migrate deploy && pnpm exec prisma db seed && pnpm build && pnpm start --port ${PORT}`,
     url: baseURL,
     reuseExistingServer: false,
     timeout: 300_000,

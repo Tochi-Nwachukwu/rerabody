@@ -10,7 +10,9 @@ import {
   OrderRefunded,
   OrderShipped,
 } from "./order-emails";
+import NewsletterWelcome from "./newsletter-welcome";
 import PasswordReset from "./password-reset";
+import SettingsTest from "./settings-test";
 import VerifyEmail from "./verify-email";
 import Welcome from "./welcome";
 
@@ -76,6 +78,16 @@ export const emailTemplates = {
   "order-cancelled": define({
     component: OrderCancelled,
     subject: (p) => `Order ${p.order.number} was cancelled`,
+    stream: "orders",
+  }),
+  "newsletter-welcome": define({
+    component: NewsletterWelcome,
+    subject: () => "Welcome to the Rera Body list",
+    stream: "marketing",
+  }),
+  "settings-test": define({
+    component: SettingsTest,
+    subject: () => "Test email from your store",
     stream: "orders",
   }),
   "order-refunded": define({

@@ -24,7 +24,7 @@ test("a customer can register, verify, and is refused at /admin", async ({ page 
 
 test("password reset responds the same for unknown emails", async ({ page }) => {
   await page.goto("/forgot-password");
-  await page.getByLabel("Email").fill(uniqueEmail("nobody"));
+  await page.getByLabel("Email", { exact: true }).fill(uniqueEmail("nobody"));
   await page.getByRole("button", { name: "Send reset link" }).click();
   await expect(page.getByText("If an account exists for that email")).toBeVisible();
 });

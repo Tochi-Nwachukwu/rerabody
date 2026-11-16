@@ -1,9 +1,11 @@
 import { ShoppingBag, User } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { getCollections } from "@/server/queries/catalog";
+import { getMediaByIds } from "@/server/queries/home";
 import { getSiteSettings } from "@/server/queries/settings";
 
 import { MobileMenu, type NavLink } from "./mobile-menu";
@@ -21,6 +23,9 @@ export async function getNavLinks(): Promise<NavLink[]> {
 // G1 header. The cart slot is filled in by the layout (it reads the cart cookie).
 export async function Header({ cartSlot }: { cartSlot?: ReactNode }) {
   const [settings, links] = await Promise.all([getSiteSettings(), getNavLinks()]);
+  const [logo] = settings.store.logoMediaId
+    ? await getMediaByIds([settings.store.logoMediaId])
+    : [];
   return (
     <header className="bg-background/95 sticky top-0 z-40 border-b backdrop-blur">
       <div className="mx-auto grid h-16 max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6">
@@ -42,7 +47,18 @@ export async function Header({ cartSlot }: { cartSlot?: ReactNode }) {
           href="/"
           className="font-heading text-xl font-semibold tracking-[0.14em] uppercase sm:text-2xl"
         >
-          {settings.store.name}
+          {logo ? (
+            <Image
+              src={logo.url}
+              alt={settings.store.name}
+              width={160}
+              height={48}
+              className="h-10 w-auto object-contain"
+              priority
+            />
+          ) : (
+            settings.store.name
+          )}
         </Link>
         <div className="flex items-center justify-end gap-0.5">
           <SearchOverlay />

@@ -11,8 +11,7 @@
  * Safe to run more than once: catalogue rows are upserted by slug or SKU,
  * and content tables (homepage sections, FAQ) are only filled when empty.
  *
- * Homepage section `data` shapes are provisional until the Zod schemas for
- * each section type are written in Phase 6.
+ * Homepage section data is validated against the schemas in src/lib/home-sections.ts.
  */
 import "dotenv/config";
 
@@ -20,6 +19,7 @@ import { hashPassword } from "better-auth/crypto";
 import { z } from "zod";
 
 import { Prisma } from "../src/generated/prisma/client";
+import { type SectionType, sectionSchemas } from "../src/lib/home-sections";
 import { createPrismaClient } from "../src/server/prisma";
 import { DEFAULT_ROLE_PERMISSIONS, OWNER_ROLE_NAME } from "../src/server/permissions";
 
@@ -352,6 +352,7 @@ async function seedHomeSections(
       data: {
         items: ["body-butters", "nightwear", "gift-sets"].map((slug) => ({
           collectionId: collectionIds[slug],
+          title: "",
           imageId: null,
         })),
       },
@@ -443,7 +444,7 @@ async function seedHomeSections(
     },
     {
       type: "TESTIMONIALS",
-      data: { heading: "What customers say", source: "featuredReviews", limit: 6 },
+      data: { heading: "What customers say", limit: 6 },
     },
     {
       type: "NEWSLETTER",
@@ -456,7 +457,8 @@ async function seedHomeSections(
       type: s.type,
       position,
       isVisible: true,
-      data: s.data,
+      // Throws if the placeholder data does not match the section schema.
+      data: sectionSchemas[s.type as SectionType].parse(s.data) as Prisma.InputJsonValue,
     })),
   });
 }

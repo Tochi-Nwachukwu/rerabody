@@ -15,7 +15,8 @@
     "test:e2e": "playwright test",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",
-    "db:migrate:dev": "prisma migrate dev && prisma generate",
+    "db:migrate:dev": "prisma migrate dev",
+    "postdb:migrate:dev": "prisma generate",
     "db:seed": "prisma db seed",
     "postinstall": "prisma generate"
   },

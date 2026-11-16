@@ -121,3 +121,22 @@ Choices made where the build plan was silent or a dependency forced a change. Ne
 | Delivered email | One review link per distinct product, signed and valid for 120 days | Phase 7 builds the form |
 | Account deletion | Better Auth `deleteUser` with password confirmation; staff accounts are refused. Orders keep their history (`userId` set null) | Accounts module in build-plan.md |
 | Resend webhook | Verified with the Svix headers through `resend.webhooks.verify`, deduplicated through `ProcessedWebhookEvent` (provider `resend`). Bounces and complaints mark the newsletter subscriber BOUNCED and the EmailLog row | Plan |
+
+## Phase 6
+
+| Topic | Decision | Why |
+| --- | --- | --- |
+| Routes | A19 `/admin/content/homepage`, A20 `/admin/content/homepage/[id]`, A21 `/admin/content/pages` and `/admin/content/pages/[id]`, A22 `/admin/content/faq`, A28 `/admin/settings`, S27 `/{slug}` (terms, privacy, shipping-returns and owner pages), S29 `/faq`, S30 `/unsubscribe`, draft preview `/preview/home` | No screen map |
+| Draft columns | New `HomeSection.draftPosition` and `draftIsVisible` alongside `draftData` and `isDraftDeleted`. New sections have `data = null` until first publish | "Reordering and hiding a section changes the live homepage after publish and not before" needs draft order and visibility |
+| Publish | One transaction copies every draft to the live columns; refuses if any section fails its schema. Discard removes never-published sections and clears drafts | Atomic, and invalid data never reaches the live page |
+| Section mapping to S1 | Hero; collection banners; best sellers and new arrivals use the product grid (manual, best sellers or newest, optional category tabs); "Why Rera", "Shop all" and "Brand story" use text and image; two featured product spotlights; ticker; steps; testimonials (featured approved reviews); newsletter. The footer is part of the layout | Section types in the plan |
+| A20 forms | Generated from a field list per section type (text, textarea, link, number, switch, select, image, images, product, products, collection, list, repeater) and validated with the same Zod schema as the server | "Section editor forms generated from the section type" |
+| Links in sections | Must start with `/` or `https://` | Blocks `javascript:` links |
+| Draft preview | Staff with `content.manage` only; everyone else gets the not-found page. Uncached | Phase 6 check |
+| Pages | Body edits go to `draftBody`; publish copies them to `body`. Title and meta save immediately. Terms, privacy and shipping-returns cannot be deleted or renamed. Slugs used by app routes are refused | Plan |
+| FAQ | Plain text answers, grouped by topic, reorderable; FAQPage structured data on S29 | Simple and SEO friendly |
+| Settings | Each SiteSetting key has a Zod schema with defaults (`src/lib/settings.ts`), so a missing row never breaks a page. Footer links are edited as `Label \| /link` lines | Owner-editable without a complex form |
+| Test email | New `settings-test` template, sent to the admin alert address (or the staff member if unset) | "With the test email button" |
+| Newsletter | Signup always returns the same message (rule 13); welcome email deduped by `newsletter:{id}`; re-subscribing an unsubscribed address reactivates it. Marketing sends are suppressed for unsubscribed or bounced addresses | Plan |
+| Unsubscribe | Signed link (HMAC of the subscriber id). The page needs one button press, so link scanners cannot unsubscribe people by fetching the URL | One click from any marketing email |
+| e2e database | The Playwright web server command migrates and seeds the e2e database before building, because the build prerenders from it | Playwright starts the web server before global setup |
