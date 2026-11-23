@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 import { emailField } from "@/lib/schemas/auth";
-import { addressSchema } from "@/lib/schemas/checkout";
+import { addressFields, checkAddress } from "@/lib/schemas/checkout";
 import { db } from "@/server/db";
 import { enforceRateLimit } from "@/server/rate-limit";
 import { UserError } from "@/server/errors";
@@ -18,7 +18,9 @@ import { signValue } from "@/server/signed-links";
 import { publicAction, userAction } from "./safe-action";
 
 export const saveAddressAction = userAction(
-  addressSchema.extend({ id: z.string().optional(), isDefault: z.boolean() }),
+  addressFields
+    .extend({ id: z.string().optional(), isDefault: z.boolean() })
+    .superRefine(checkAddress),
   async (input, user) => {
     const a = await saveAddress(db, user.id, input);
     return { id: a.id };

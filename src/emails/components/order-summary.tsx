@@ -17,6 +17,7 @@ export type EmailOrder = {
   subtotal: number;
   discountTotal: number;
   shippingTotal: number;
+  taxTotal: number;
   total: number;
   couponCode: string | null;
   shippingAddress: {
@@ -74,12 +75,16 @@ export function OrderSummary({ order }: { order: EmailOrder }) {
             </Text>
           ) : null}
           <Text style={{ ...cell, color: colors.muted }}>Delivery ({order.shippingMethod})</Text>
+          {order.taxTotal > 0 ? (
+            <Text style={{ ...cell, color: colors.muted }}>Sales tax</Text>
+          ) : null}
           <Text style={{ ...cell, fontWeight: 600 }}>Total</Text>
         </Column>
         <Column style={{ textAlign: "right" }}>
           <Text style={cell}>{money(order.subtotal)}</Text>
           {order.discountTotal > 0 ? <Text style={cell}>−{money(order.discountTotal)}</Text> : null}
           <Text style={cell}>{money(order.shippingTotal)}</Text>
+          {order.taxTotal > 0 ? <Text style={cell}>{money(order.taxTotal)}</Text> : null}
           <Text style={{ ...cell, fontWeight: 600 }}>{money(order.total)}</Text>
         </Column>
       </Row>
@@ -111,6 +116,7 @@ export const sampleOrder: EmailOrder = {
   subtotal: 2900,
   discountTotal: 0,
   shippingTotal: 395,
+  taxTotal: 0,
   total: 3295,
   couponCode: null,
   shippingAddress: {

@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { sql } from "./db";
-import { addProductToCart, checkoutAsGuest, uniqueEmail } from "./helpers";
+import { addProductToCart, checkoutAsGuest, fillCheckoutAddress, uniqueEmail } from "./helpers";
 
 test("a guest buys a product with the fake provider and sees the order as paid", async ({
   page,
@@ -26,11 +26,7 @@ test("a guest buys a product with the fake provider and sees the order as paid",
 test("cancelling on the payment page keeps the cart", async ({ page }) => {
   await addProductToCart(page, "whipped-shea-body-butter");
   await page.goto("/checkout");
-  await page.getByLabel("Email", { exact: true }).fill(uniqueEmail("cancel"));
-  await page.getByLabel("Full name").fill("Test Buyer");
-  await page.getByLabel("Phone").fill("07000000000");
-  await page.getByLabel("Address line 1").fill("1 Test Street");
-  await page.getByLabel("Town or city").fill("London");
+  await fillCheckoutAddress(page, uniqueEmail("cancel"));
   await page.getByRole("button", { name: "Pay now" }).click();
   await page.getByRole("button", { name: "Simulate expired session" }).click();
   await expect(page.getByRole("heading", { name: "Payment not completed" })).toBeVisible();

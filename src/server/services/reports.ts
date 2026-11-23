@@ -2,8 +2,10 @@ import type { PrismaClient } from "@/generated/prisma/client";
 
 /**
  * Report definitions (A3, A27). Dates are UTC. An order counts once it is
- * paid (by paidAt). Net revenue = order totals minus refunds; cancelled or
- * fully refunded orders therefore net to zero and are not counted as orders.
+ * paid (by paidAt). Net revenue = order totals minus refunds, excluding sales tax
+ * (tax is collected for the state, not earned). A partial refund is assumed to
+ * return tax in proportion. Cancelled or fully refunded orders net to zero and
+ * are not counted as orders.
  */
 export type Range = { from: Date; to: Date };
 export type Granularity = "day" | "week" | "month";
@@ -16,19 +18,27 @@ export async function salesReport(
   granularity: Granularity = "day",
 ) {
   const totals = await prisma.$queryRaw<
-    { gross: bigint | null; refunds: bigint | null; orders: bigint; countedGross: bigint | null }[]
+    {
+      gross: bigint | null;
+      refunds: bigint | null;
+      tax: bigint | null;
+      orders: bigint;
+      countedGross: bigint | null;
+    }[]
   >`
     SELECT
       SUM(o.total) AS gross,
       SUM(COALESCE(p.refunded, 0)) AS refunds,
+      SUM(ROUND((o.total - COALESCE(p.refunded, 0))::numeric * o."taxTotal" / NULLIF(o.total, 0))) AS tax,
       COUNT(*) FILTER (WHERE o.status::text = ANY(${COUNTED})) AS orders,
-      SUM(o.total) FILTER (WHERE o.status::text = ANY(${COUNTED})) AS "countedGross"
+      SUM(o.total - o."taxTotal") FILTER (WHERE o.status::text = ANY(${COUNTED})) AS "countedGross"
     FROM "Order" o
     LEFT JOIN (SELECT "orderId", SUM("refundedAmount") AS refunded FROM "Payment" GROUP BY "orderId") p ON p."orderId" = o.id
     WHERE o."paidAt" >= ${range.from} AND o."paidAt" < ${range.to}`;
   const series = await prisma.$queryRaw<{ bucket: Date; revenue: bigint; orders: bigint }[]>`
     SELECT date_trunc(${granularity}, o."paidAt" AT TIME ZONE 'UTC') AS bucket,
-      SUM(o.total - COALESCE(p.refunded, 0)) AS revenue,
+      SUM(o.total - COALESCE(p.refunded, 0)
+        - COALESCE(ROUND((o.total - COALESCE(p.refunded, 0))::numeric * o."taxTotal" / NULLIF(o.total, 0)), 0)) AS revenue,
       COUNT(*) FILTER (WHERE o.status::text = ANY(${COUNTED})) AS orders
     FROM "Order" o
     LEFT JOIN (SELECT "orderId", SUM("refundedAmount") AS refunded FROM "Payment" GROUP BY "orderId") p ON p."orderId" = o.id
@@ -36,9 +46,11 @@ export async function salesReport(
     GROUP BY 1 ORDER BY 1`;
   const t = totals[0];
   const orders = Number(t?.orders ?? 0);
-  const revenue = Number(t?.gross ?? 0) - Number(t?.refunds ?? 0);
+  const taxCollected = Number(t?.tax ?? 0);
+  const revenue = Number(t?.gross ?? 0) - Number(t?.refunds ?? 0) - taxCollected;
   return {
     revenue,
+    taxCollected,
     refunds: Number(t?.refunds ?? 0),
     orders,
     averageOrderValue: orders ? Math.round(Number(t?.countedGross ?? 0) / orders) : 0,
@@ -167,6 +179,7 @@ export async function ordersCsv(prisma: PrismaClient, range: Range, digits = 2) 
       "subtotal",
       "discount",
       "shipping",
+      "tax",
       "total",
       "refunded",
       "currency",
@@ -181,6 +194,7 @@ export async function ordersCsv(prisma: PrismaClient, range: Range, digits = 2) 
       major(o.subtotal),
       major(o.discountTotal),
       major(o.shippingTotal),
+      major(o.taxTotal),
       major(o.total),
       major(o.payments.reduce((s, p) => s + p.refundedAmount, 0)),
       o.currency,

@@ -95,6 +95,12 @@ async function Success({
             <dt>Delivery</dt>
             <dd className="tabular-nums">{formatMoney(order.shippingTotal, order.currency)}</dd>
           </div>
+          {order.taxTotal > 0 ? (
+            <div className="flex justify-between">
+              <dt>Sales tax</dt>
+              <dd className="tabular-nums">{formatMoney(order.taxTotal, order.currency)}</dd>
+            </div>
+          ) : null}
           <div className="flex justify-between text-base font-medium">
             <dt>Total</dt>
             <dd className="tabular-nums">{formatMoney(order.total, order.currency)}</dd>

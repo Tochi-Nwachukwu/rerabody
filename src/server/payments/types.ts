@@ -8,6 +8,21 @@ export type CheckoutLine = {
   unitAmount: number;
   quantity: number;
   imageUrl?: string | null;
+  /** Stripe product tax code. Used only when automatic tax is on. */
+  taxCode?: string;
+};
+
+/** Where the order ships; sales tax is worked out from this address. */
+export type CheckoutAddress = {
+  name: string;
+  phone?: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  state?: string;
+  postalCode?: string;
+  /** ISO 3166-1 alpha-2, e.g. "US". */
+  countryCode: string;
 };
 
 export type CreateCheckoutInput = {
@@ -17,6 +32,8 @@ export type CreateCheckoutInput = {
   currency: string;
   lines: CheckoutLine[];
   shipping: { name: string; amount: number };
+  /** Null when the country could not be resolved; the provider then charges no tax. */
+  address: CheckoutAddress | null;
   discount: { amount: number; label: string } | null;
   successUrl: string;
   cancelUrl: string;
@@ -29,6 +46,8 @@ export type PaymentEvent =
       sessionId: string;
       paymentId: string | null;
       amountTotal: number | null;
+      /** Sales tax included in amountTotal. Absent or 0 when no tax was charged. */
+      amountTax?: number | null;
     }
   | { kind: "checkout.expired"; eventId: string; sessionId: string }
   | { kind: "checkout.failed"; eventId: string; sessionId: string }

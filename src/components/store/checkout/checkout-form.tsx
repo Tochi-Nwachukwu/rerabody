@@ -25,9 +25,12 @@ export function CheckoutForm({
   shippingMethods,
   user,
   savedAddresses,
+  taxAtPayment = false,
 }: {
   cart: CartView;
   currency: string;
+  /** Stripe Tax is on: sales tax is added on the payment page. */
+  taxAtPayment?: boolean;
   shippingMethods: ShippingOption[];
   user: { email: string; name: string } | null;
   savedAddresses: SavedAddress[];
@@ -46,7 +49,7 @@ export function CheckoutForm({
         city: "",
         state: "",
         postalCode: "",
-        country: "United Kingdom",
+        country: "United States",
       },
       shippingMethodId: shippingMethods[0]?.id ?? "",
       saveAddress: false,
@@ -166,14 +169,14 @@ export function CheckoutForm({
             />
             <TextField
               id="state"
-              label="County or state (optional)"
+              label="State or region"
               autoComplete="address-level1"
               error={a?.state?.message}
               {...form.register("address.state")}
             />
             <TextField
               id="postalCode"
-              label="Postcode"
+              label="ZIP or postal code"
               autoComplete="postal-code"
               error={a?.postalCode?.message}
               {...form.register("address.postalCode")}
@@ -280,10 +283,16 @@ export function CheckoutForm({
             </dd>
           </div>
           <div className="flex justify-between border-t pt-2 text-base font-medium">
-            <dt>Total</dt>
+            <dt>{taxAtPayment ? "Total before tax" : "Total"}</dt>
             <dd className="tabular-nums">{formatMoney(total, currency)}</dd>
           </div>
         </dl>
+        {taxAtPayment ? (
+          <p className="text-muted-foreground text-xs">
+            Sales tax, where it applies, is calculated from your delivery address and added on the
+            payment page.
+          </p>
+        ) : null}
         <Button
           type="submit"
           size="lg"
@@ -293,7 +302,7 @@ export function CheckoutForm({
           {isSubmitting ? "Starting payment…" : "Pay now"}
         </Button>
         <p className="text-muted-foreground text-xs">
-          You will pay on a secure page. Prices include tax.
+          You will pay on a secure page.{taxAtPayment ? "" : " Prices include tax."}
         </p>
       </aside>
     </form>

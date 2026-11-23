@@ -115,6 +115,12 @@ export default async function OrderDetailPage({ params }: PageProps<"/admin/orde
                 <dt>Delivery ({method.name})</dt>
                 <dd className="tabular-nums">{money(order.shippingTotal)}</dd>
               </div>
+              {order.taxTotal > 0 ? (
+                <div className="flex justify-between">
+                  <dt>Sales tax</dt>
+                  <dd className="tabular-nums">{money(order.taxTotal)}</dd>
+                </div>
+              ) : null}
               <div className="flex justify-between font-medium">
                 <dt>Total</dt>
                 <dd className="tabular-nums">{money(order.total)}</dd>

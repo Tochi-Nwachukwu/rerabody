@@ -11,7 +11,7 @@ import { CartLines, CartNotices } from "./cart-lines";
 import { CouponForm } from "./coupon-form";
 
 // S8 cart
-export function CartPage() {
+export function CartPage({ taxAtPayment = false }: { taxAtPayment?: boolean }) {
   const { cart, currency } = useCart();
   if (!cart) {
     return (
@@ -70,7 +70,11 @@ export function CartPage() {
         >
           Checkout
         </Link>
-        <p className="text-muted-foreground text-xs">Prices include tax.</p>
+        <p className="text-muted-foreground text-xs">
+          {taxAtPayment
+            ? "Sales tax, where it applies, is added at payment."
+            : "Prices include tax."}
+        </p>
       </aside>
     </div>
   );

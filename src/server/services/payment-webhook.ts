@@ -70,9 +70,18 @@ async function markPaid(
   if (!payment) return { status: "ignored", reason: `Unknown checkout session ${event.sessionId}` };
   const order = payment.order;
 
+  // Sales tax is added by the provider at payment, so the order total grows by it.
+  const tax = Math.max(0, event.amountTax ?? 0);
+  const expectedTotal = order.total + (order.status === "PENDING_PAYMENT" ? tax : 0);
+
   await tx.payment.update({
     where: { id: payment.id },
-    data: { status: "SUCCEEDED", providerPaymentId: event.paymentId ?? payment.providerPaymentId },
+    data: {
+      status: "SUCCEEDED",
+      providerPaymentId: event.paymentId ?? payment.providerPaymentId,
+      // Refunds are capped at what was actually charged, tax included.
+      ...(event.amountTotal !== null ? { amount: event.amountTotal } : {}),
+    },
   });
 
   if (order.status !== "PENDING_PAYMENT") {
@@ -102,13 +111,13 @@ async function markPaid(
     to: "PAID",
     actorId: null,
     note: "Payment confirmed",
-    data: { paidAt: now },
+    data: { paidAt: now, ...(tax > 0 ? { taxTotal: tax, total: expectedTotal } : {}) },
   });
 
   const reasons: string[] = [];
-  if (event.amountTotal !== null && event.amountTotal !== order.total) {
+  if (event.amountTotal !== null && event.amountTotal !== expectedTotal) {
     reasons.push(
-      `Amount paid (${event.amountTotal}) does not match the order total (${order.total}).`,
+      `Amount paid (${event.amountTotal}) does not match the order total (${expectedTotal}).`,
     );
   }
 

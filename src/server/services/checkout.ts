@@ -1,4 +1,5 @@
 import type { Prisma, PrismaClient } from "@/generated/prisma/client";
+import { countryCode } from "@/lib/country";
 import type { AddressData } from "@/lib/schemas/checkout";
 import { variantLabel } from "@/lib/variants";
 import { UserError } from "@/server/errors";
@@ -161,6 +162,18 @@ export async function createOrderFromCart(
     return created;
   });
 
+  // Tax codes come from each product's category (Stripe uses them only when tax is on).
+  const categoryIds = [...new Set(lines.map((l) => l.categoryId).filter((c): c is string => !!c))];
+  const taxCodeOf = new Map(
+    (
+      await prisma.category.findMany({
+        where: { id: { in: categoryIds } },
+        select: { id: true, taxCode: true },
+      })
+    ).map((c) => [c.id, c.taxCode]),
+  );
+  const code = countryCode(input.address.country);
+
   const base = input.appUrl.replace(/\/$/, "");
   const access = `order=${order.id}&token=${guestToken}`;
   const absolute = (url: string | null) => (url && url.startsWith("/") ? `${base}${url}` : url);
@@ -175,8 +188,21 @@ export async function createOrderFromCart(
         unitAmount: l.unitPrice,
         quantity: l.quantity,
         imageUrl: absolute(l.imageUrl),
+        taxCode: (l.categoryId && taxCodeOf.get(l.categoryId)) || undefined,
       })),
       shipping: { name: shipping.name, amount: shipping.price },
+      address: code
+        ? {
+            name: input.address.fullName,
+            phone: input.address.phone,
+            line1: input.address.line1,
+            line2: input.address.line2,
+            city: input.address.city,
+            state: input.address.state,
+            postalCode: input.address.postalCode,
+            countryCode: code,
+          }
+        : null,
       discount: discount > 0 ? { amount: discount, label: `Code ${couponCode}` } : null,
       successUrl: `${base}/checkout/success?${access}&session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl: `${base}/checkout/cancelled?${access}`,

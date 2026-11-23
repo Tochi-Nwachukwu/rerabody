@@ -50,6 +50,7 @@ async function Checkout() {
     <CheckoutForm
       cart={cart}
       currency={env.STORE_CURRENCY}
+      taxAtPayment={env.PAYMENT_PROVIDER === "stripe" && env.STRIPE_AUTOMATIC_TAX}
       shippingMethods={shippingMethods}
       user={session ? { email: session.user.email, name: session.user.name } : null}
       savedAddresses={addresses.map((a) => ({

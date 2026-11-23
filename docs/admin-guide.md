@@ -101,6 +101,17 @@ Nothing changes on the live site until you click **Publish**. Click **Preview** 
 
 **FAQ** questions appear on the FAQ page grouped by topic. Changes are live as soon as you save. Drag to reorder.
 
+## Sales tax
+
+Sales tax is worked out by Stripe from the delivery address and added on the payment page. Customers see "Total before tax" at checkout, and the tax appears on their receipt, the order page and the emails.
+
+1. Your accountant tells you which states you must collect tax in.
+2. In the Stripe dashboard, go to **Tax → Registrations** and add each of those states. Stripe only collects tax in states listed there. Stripe also warns you when sales in another state get close to the point where you must register.
+3. Under **Categories**, open each category and choose its **Sales tax category**: *Skin care products* for body butters, *Clothing and footwear* for nightwear and loungewear. Products without a category are taxed as general goods.
+4. Ask your developer to switch tax on.
+
+**Reports** show revenue without tax, and the tax collected separately. Stripe's own tax reports (Stripe → Tax → Reports) are what you or your accountant file from.
+
 ## Coupons
 
 1. **Coupons → New coupon**.

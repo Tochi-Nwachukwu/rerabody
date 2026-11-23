@@ -49,6 +49,7 @@ function toEmailOrder(order: LoadedOrder): EmailOrder {
     subtotal: order.subtotal,
     discountTotal: order.discountTotal,
     shippingTotal: order.shippingTotal,
+    taxTotal: order.taxTotal,
     total: order.total,
     couponCode: order.couponCode,
     shippingAddress: address,

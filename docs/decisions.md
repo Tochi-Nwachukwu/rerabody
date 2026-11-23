@@ -187,3 +187,17 @@ Choices made where the build plan was silent or a dependency forced a change. Ne
 | Accessibility | axe-core runs in Playwright on 15 storefront pages and 10 admin pages (WCAG 2.2 AA rules) with zero violations. The destructive colour token was darkened for contrast | Repeatable a11y check |
 | Public API routes | `/api/auth/*` (Better Auth) and `/api/search/suggest` are public by design; every other `/api` route needs a signature, the cron secret or a staff session, and `/admin` needs a staff session. Covered by `coupon-and-access.spec.ts` | Phase 9 check |
 | Final Lighthouse (mobile, production build) | S2: performance 90, accessibility 100, best practices 100, SEO 100. S5: 86, 100, 100, 100 | Placeholder content, no real images yet |
+
+## Sales tax (Stripe Tax)
+
+| Topic | Decision | Why |
+| --- | --- | --- |
+| Switch | `STRIPE_AUTOMATIC_TAX=on` turns on `automatic_tax` in Stripe Checkout. Default `off` | Stripe collects nothing (and reports no error) where the account has no active registration, so tax stays off until registrations exist |
+| Customer location | When tax is on, a Stripe Customer is created per checkout with the shipping address the store collected, and the session uses it. No address is collected again on Stripe's page | Stripe Tax needs the destination address; the store already has it |
+| Address rules | The country must resolve to an ISO code (`src/lib/country.ts`). US addresses need a state and a 5-digit ZIP. Checkout defaults to United States and uses US labels | Stripe needs the code; US sales tax depends on state and ZIP |
+| Tax codes | Per category (`Category.taxCode`), chosen in the admin from `src/lib/tax-codes.ts`: Skin care products `txcd_32050013`, Clothing and footwear `txcd_30011000`, General tangible goods `txcd_99999999` (default), Nontaxable `txcd_00000000`. Shipping uses `txcd_92010001`. All copied from https://docs.stripe.com/tax/tax-codes | Clothing is exempt in some states; the owner's accountant confirms the choice |
+| Prices | `tax_behavior: exclusive`: prices and shipping are shown before tax and Stripe adds tax on the payment page. Checkout says "Total before tax" when tax is on | US convention |
+| Order totals | `Order.taxTotal` is filled from the paid session (`total_details.amount_tax`) and added to `Order.total`; `Payment.amount` becomes the amount charged so refunds can include tax. A charge that does not equal subtotal − discount + shipping + tax is still flagged for review | One source of truth after payment |
+| Reports | Revenue and average order exclude sales tax; "Sales tax collected" is shown separately. Partial refunds are assumed to return tax in proportion. Coupon "order revenue" excludes tax; customer spend includes it (what they paid) | Tax is collected for the state, not earned |
+| Refunds | Refunds go through Stripe as before. Stripe's tax reports count a paid Checkout Session as tax collected and a refund of it as a decrease (https://docs.stripe.com/tax/reports). Stripe does not document how a partial refund on a Checkout payment splits between price and tax; test one in the sandbox before relying on the split | No store-side tax ledger; Stripe's reports are what gets filed |
+| Location source | The Customer's saved shipping address ("If you don't collect the shipping address, Checkout uses the Customer's existing shipping address", https://docs.stripe.com/tax/checkout/page) | Confirms no extra Checkout parameters are needed |

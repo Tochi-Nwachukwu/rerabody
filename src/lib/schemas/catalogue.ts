@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { SLUG_PATTERN } from "@/lib/slug";
+import { TAX_CODE_IDS } from "@/lib/tax-codes";
 import { checkVariantsMatchOptions } from "@/lib/variants";
 
 /** Tiptap document JSON. Structure is checked loosely; rendering ignores unknown nodes. */
@@ -36,6 +37,8 @@ export const categorySchema = z.object({
   slug: slugSchema,
   description: optionalText(500),
   imageId: z.string().nullable(),
+  // Stripe product tax code; null uses the store default (see src/lib/tax-codes.ts).
+  taxCode: z.enum(TAX_CODE_IDS).nullable().default(null),
 });
 export type CategoryInput = z.input<typeof categorySchema>;
 

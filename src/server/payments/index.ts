@@ -19,6 +19,7 @@ export function getStripeProvider(): PaymentProvider {
   stripe ??= createStripeProvider({
     secretKey: env.STRIPE_SECRET_KEY,
     webhookSecret: env.STRIPE_WEBHOOK_SECRET,
+    automaticTax: env.STRIPE_AUTOMATIC_TAX,
   });
   return stripe;
 }

@@ -70,7 +70,7 @@ export async function listCoupons(prisma: PrismaClient) {
   const [coupons, stats] = await Promise.all([
     prisma.coupon.findMany({ orderBy: { createdAt: "desc" } }),
     prisma.$queryRaw<{ couponId: string; uses: bigint; discount: bigint; revenue: bigint }[]>`
-      SELECT r."couponId", COUNT(*) AS uses, COALESCE(SUM(r.amount), 0) AS discount, COALESCE(SUM(o.total), 0) AS revenue
+      SELECT r."couponId", COUNT(*) AS uses, COALESCE(SUM(r.amount), 0) AS discount, COALESCE(SUM(o.total - o."taxTotal"), 0) AS revenue
       FROM "CouponRedemption" r JOIN "Order" o ON o.id = r."orderId"
       WHERE o.status NOT IN ('CANCELLED', 'REFUNDED')
       GROUP BY r."couponId"`,

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { CartPage } from "@/components/store/cart/cart-page";
 import { PageTitle } from "@/components/store/page-title";
+import { env } from "@/env";
 
 export const metadata: Metadata = { title: "Cart", robots: { index: false } };
 
@@ -11,7 +12,7 @@ export default function Cart() {
     <>
       <PageTitle title="Your cart" />
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <CartPage />
+        <CartPage taxAtPayment={env.PAYMENT_PROVIDER === "stripe" && env.STRIPE_AUTOMATIC_TAX} />
       </div>
     </>
   );

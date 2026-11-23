@@ -18,10 +18,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { addressSchema } from "@/lib/schemas/checkout";
+import { addressFields, checkAddress } from "@/lib/schemas/checkout";
 import { deleteAddressAction, saveAddressAction } from "@/server/actions/account";
 
-const schema = addressSchema.extend({ id: z.string().optional(), isDefault: z.boolean() });
+const schema = addressFields
+  .extend({ id: z.string().optional(), isDefault: z.boolean() })
+  .superRefine(checkAddress);
 type Values = z.input<typeof schema>;
 export type SavedAddress = Values & { id: string };
 
@@ -33,7 +35,7 @@ const blank: Values = {
   city: "",
   state: "",
   postalCode: "",
-  country: "United Kingdom",
+  country: "United States",
   isDefault: false,
 };
 
@@ -175,13 +177,13 @@ export function AddressBook({ addresses }: { addresses: SavedAddress[] }) {
             />
             <TextField
               id="a-state"
-              label="County or state (optional)"
+              label="State or region"
               autoComplete="address-level1"
               {...form.register("state")}
             />
             <TextField
               id="a-postcode"
-              label="Postcode"
+              label="ZIP or postal code"
               autoComplete="postal-code"
               {...form.register("postalCode")}
             />

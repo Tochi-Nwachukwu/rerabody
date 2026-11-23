@@ -8,6 +8,7 @@ import { type ImageValue, ImageField } from "@/components/admin/image-field";
 import { SortableList } from "@/components/admin/sortable-list";
 import { FormMessage, TextAreaField, TextField } from "@/components/form/text-field";
 import { Button } from "@/components/ui/button";
+import { Field, FieldLabel } from "@/components/ui/field";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { categorySchema } from "@/lib/schemas/catalogue";
 import { slugify } from "@/lib/slug";
+import { TAX_CODES, type TaxCodeId, taxCodeLabel } from "@/lib/tax-codes";
 import {
   deleteCategoryAction,
   reorderCategoriesAction,
@@ -28,11 +30,19 @@ export type CategoryRow = {
   name: string;
   slug: string;
   description: string | null;
+  taxCode: string | null;
   image: ImageValue;
   productCount: number;
 };
 
-type Draft = { id?: string; name: string; slug: string; description: string; image: ImageValue };
+type Draft = {
+  id?: string;
+  name: string;
+  slug: string;
+  description: string;
+  taxCode: TaxCodeId | null;
+  image: ImageValue;
+};
 
 // A6 categories
 export function CategoryManager({ initial }: { initial: CategoryRow[] }) {
@@ -50,6 +60,7 @@ export function CategoryManager({ initial }: { initial: CategoryRow[] }) {
       slug: draft.slug,
       description: draft.description,
       imageId: draft.image?.id ?? null,
+      taxCode: draft.taxCode,
     };
     const check = categorySchema.safeParse(payload);
     if (!check.success) return setError(check.error.issues[0]?.message ?? "Check the form");
@@ -68,7 +79,7 @@ export function CategoryManager({ initial }: { initial: CategoryRow[] }) {
         className="self-start"
         onClick={() => {
           setError(null);
-          setDraft({ name: "", slug: "", description: "", image: null });
+          setDraft({ name: "", slug: "", description: "", taxCode: null, image: null });
         }}
       >
         Add category
@@ -89,7 +100,8 @@ export function CategoryManager({ initial }: { initial: CategoryRow[] }) {
             <div className="min-w-0">
               <p className="font-medium">{r.name}</p>
               <p className="text-muted-foreground truncate text-xs">
-                /{r.slug} · {r.productCount} product{r.productCount === 1 ? "" : "s"}
+                /{r.slug} · {r.productCount} product{r.productCount === 1 ? "" : "s"} · Tax:{" "}
+                {taxCodeLabel(r.taxCode)}
               </p>
             </div>
             <div className="flex gap-1">
@@ -103,6 +115,8 @@ export function CategoryManager({ initial }: { initial: CategoryRow[] }) {
                     name: r.name,
                     slug: r.slug,
                     description: r.description ?? "",
+                    taxCode: (TAX_CODES.find((c) => c.id === r.taxCode)?.id ??
+                      null) as TaxCodeId | null,
                     image: r.image,
                   });
                 }}
@@ -161,6 +175,28 @@ export function CategoryManager({ initial }: { initial: CategoryRow[] }) {
                 value={draft.description}
                 onChange={(e) => setDraft({ ...draft, description: e.target.value })}
               />
+              <Field>
+                <FieldLabel htmlFor="cat-tax">Sales tax category</FieldLabel>
+                <select
+                  id="cat-tax"
+                  className="bg-background h-8 rounded-lg border px-2 text-sm"
+                  value={draft.taxCode ?? ""}
+                  onChange={(e) =>
+                    setDraft({ ...draft, taxCode: (e.target.value || null) as TaxCodeId | null })
+                  }
+                >
+                  <option value="">Store default (general tangible goods)</option>
+                  {TAX_CODES.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}: {c.hint}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-muted-foreground text-xs">
+                  Decides how Stripe taxes these products in each state. Check the choice with your
+                  accountant.
+                </p>
+              </Field>
               <ImageField
                 label="Image"
                 value={draft.image}

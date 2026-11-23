@@ -89,10 +89,11 @@ export async function addProductToCart(page: Page, slug: string) {
 export async function fillCheckoutAddress(page: Page, email?: string) {
   if (email) await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Full name").fill("Test Buyer");
-  await page.getByLabel("Phone").fill("07000000000");
+  await page.getByLabel("Phone").fill("5125550100");
   await page.getByLabel("Address line 1").fill("1 Test Street");
-  await page.getByLabel("Town or city").fill("London");
-  await page.getByLabel("Postcode").fill("E1 1AA");
+  await page.getByLabel("Town or city").fill("Austin");
+  await page.getByLabel("State or region").fill("TX");
+  await page.getByLabel("ZIP or postal code").fill("78701");
 }
 
 /** Guest checkout through the fake payment page. Returns the order number. */

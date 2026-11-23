@@ -1,10 +1,19 @@
 import Stripe from "stripe";
 
-import { type PaymentEvent, type PaymentProvider, WebhookSignatureError } from "./types";
+import { DEFAULT_PRODUCT_TAX_CODE, SHIPPING_TAX_CODE } from "@/lib/tax-codes";
+
+import {
+  type CheckoutAddress,
+  type PaymentEvent,
+  type PaymentProvider,
+  WebhookSignatureError,
+} from "./types";
 
 export function createStripeProvider(config: {
   secretKey: string;
   webhookSecret: string;
+  /** Stripe Tax. Only collects tax where the account has an active registration. */
+  automaticTax?: boolean;
 }): PaymentProvider {
   const stripe = new Stripe(config.secretKey, {
     maxNetworkRetries: 2,
@@ -35,10 +44,34 @@ export function createStripeProvider(config: {
           ]
         : undefined;
 
+      // Stripe Tax works out the tax from the customer's shipping address, which the
+      // store has already collected. Without a resolvable address no tax is charged.
+      const tax = config.automaticTax === true && input.address !== null;
+      const customer = tax
+        ? (
+            await stripe.customers.create(
+              {
+                email: input.email,
+                name: input.address!.name,
+                phone: input.address!.phone,
+                address: stripeAddress(input.address!),
+                shipping: {
+                  name: input.address!.name,
+                  phone: input.address!.phone,
+                  address: stripeAddress(input.address!),
+                },
+                metadata: { orderId: input.orderId, orderNumber: input.orderNumber },
+              },
+              { idempotencyKey: `customer-${input.orderId}` },
+            )
+          ).id
+        : undefined;
+
       const session = await stripe.checkout.sessions.create(
         {
           mode: "payment",
-          customer_email: input.email,
+          ...(customer ? { customer } : { customer_email: input.email }),
+          ...(tax ? { automatic_tax: { enabled: true } } : {}),
           client_reference_id: input.orderId,
           metadata: { orderId: input.orderId, orderNumber: input.orderNumber },
           payment_intent_data: {
@@ -49,9 +82,12 @@ export function createStripeProvider(config: {
             price_data: {
               currency: input.currency.toLowerCase(),
               unit_amount: l.unitAmount,
+              // US prices are shown before tax; Stripe adds tax on top.
+              ...(tax ? { tax_behavior: "exclusive" as const } : {}),
               product_data: {
                 name: l.name,
                 images: l.imageUrl?.startsWith("https://") ? [l.imageUrl] : undefined,
+                ...(tax ? { tax_code: l.taxCode ?? DEFAULT_PRODUCT_TAX_CODE } : {}),
               },
             },
           })),
@@ -64,6 +100,7 @@ export function createStripeProvider(config: {
                   amount: input.shipping.amount,
                   currency: input.currency.toLowerCase(),
                 },
+                ...(tax ? { tax_behavior: "exclusive" as const, tax_code: SHIPPING_TAX_CODE } : {}),
               },
             },
           ],
@@ -117,6 +154,7 @@ export function mapStripeEvent(event: Stripe.Event): PaymentEvent {
         paymentId:
           typeof s.payment_intent === "string" ? s.payment_intent : (s.payment_intent?.id ?? null),
         amountTotal: s.amount_total,
+        amountTax: s.total_details?.amount_tax ?? 0,
       };
     }
     case "checkout.session.expired":
@@ -126,4 +164,15 @@ export function mapStripeEvent(event: Stripe.Event): PaymentEvent {
     default:
       return { kind: "ignored", eventId: event.id, type: event.type };
   }
+}
+
+function stripeAddress(a: CheckoutAddress) {
+  return {
+    line1: a.line1,
+    line2: a.line2,
+    city: a.city,
+    state: a.state,
+    postal_code: a.postalCode,
+    country: a.countryCode,
+  };
 }

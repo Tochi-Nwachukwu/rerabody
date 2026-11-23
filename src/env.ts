@@ -24,6 +24,12 @@ const serverSchema = z.object({
   STRIPE_WEBHOOK_SECRET: nonEmpty,
   // "fake" uses a built-in test payment page instead of Stripe (local work and tests only).
   PAYMENT_PROVIDER: z.enum(["stripe", "fake"]).default("stripe"),
+  // Stripe Tax. Turn on only after the Stripe account has an active tax registration:
+  // without one Stripe collects no tax and reports no error.
+  STRIPE_AUTOMATIC_TAX: z
+    .enum(["on", "off"])
+    .default("off")
+    .transform((v) => v === "on"),
   R2_ACCOUNT_ID: nonEmpty,
   R2_ACCESS_KEY_ID: nonEmpty,
   R2_SECRET_ACCESS_KEY: nonEmpty,

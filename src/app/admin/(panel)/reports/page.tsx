@@ -56,7 +56,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/admin/re
     <>
       <PageHeader
         title="Reports"
-        description="Paid orders only. Dates are in UTC. Revenue is net of refunds."
+        description="Paid orders only. Dates are in UTC. Revenue is net of refunds and excludes sales tax."
         actions={<ExportButtons from={fromText} to={toText} />}
       />
       <form action="/admin/reports" className="mb-4 flex flex-wrap items-end gap-2">
@@ -118,6 +118,7 @@ async function Sales({ range, granularity, money }: Props & { granularity: Granu
           ["Orders", String(r.orders)],
           ["Average order", money(r.averageOrderValue)],
           ["Refunds", money(r.refunds)],
+          ["Sales tax collected", money(r.taxCollected)],
         ].map(([l, v]) => (
           <div key={l} className="bg-card rounded-xl border p-4">
             <p className="text-muted-foreground text-sm">{l}</p>

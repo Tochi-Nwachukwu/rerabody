@@ -24,6 +24,7 @@ export async function saveCategory(prisma: PrismaClient, input: CategoryData, ac
       slug: input.slug,
       description: input.description,
       imageId: input.imageId,
+      taxCode: input.taxCode,
     };
     const after = before
       ? await prisma.category.update({ where: { id: before.id }, data })

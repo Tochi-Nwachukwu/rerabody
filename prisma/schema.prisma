@@ -289,6 +289,8 @@ model Category {
   slug        String   @unique
   description String?
   imageId     String?
+  // Stripe product tax code for products in this category (see src/lib/tax-codes.ts).
+  taxCode     String?
   position    Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -498,6 +500,8 @@ model Order {
   subtotal             Int
   discountTotal        Int         @default(0)
   shippingTotal        Int         @default(0)
+  // Sales tax charged by Stripe Tax, filled in from the paid checkout session. Included in total.
+  taxTotal             Int         @default(0)
   total                Int
   currency             String
   couponCode           String?
