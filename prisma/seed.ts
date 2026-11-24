@@ -390,6 +390,54 @@ async function seedHomeSections(
 ) {
   if ((await prisma.homeSection.count()) > 0) return;
 
+  // Real Rera photos for the hero slideshow, served from public/marketing/.
+  const marketing = async (
+    file: string,
+    width: number,
+    height: number,
+    bytes: number,
+    alt: string,
+  ) => {
+    const key = `static/marketing/${file}`;
+    const media = await prisma.media.upsert({
+      where: { key },
+      update: {},
+      create: { key, url: `/marketing/${file}`, mimeType: "image/webp", width, height, bytes, alt },
+    });
+    return media.id;
+  };
+  const heroImageIds = [
+    await marketing(
+      "rera-body-butters.webp",
+      2560,
+      1429,
+      224712,
+      "Rera body butters in Cranberry Fig + Lavender, True Blue, Vanilla and Lemon Dream, on stone and wood with lemons and dried roses",
+    ),
+    await marketing(
+      "rera-robes.webp",
+      2553,
+      1280,
+      372530,
+      "Three Rera robes side by side: Purple Geo, Green Leaf and Mustard Botanical",
+    ),
+    await marketing(
+      "rera-gift-set.webp",
+      2560,
+      1442,
+      198758,
+      "Rera gift box with a folded Mustard Botanical robe and a jar of Lemon Dream body butter",
+    ),
+  ];
+  // Collection tiles: a product photo for each, and the gift box for Gift sets.
+  const coverOf = async (slug: string) =>
+    (await prisma.media.findUnique({ where: { key: `static/products/${slug}.webp` } }))?.id ?? null;
+  const bannerImages: Record<string, string | null> = {
+    "body-butters": await coverOf("lemon-dream-body-butter"),
+    loungewear: await coverOf("green-leaf-robe"),
+    "gift-sets": heroImageIds[2],
+  };
+
   // Order follows build-plan.md "Homepage sections" (S1). The footer is part of the layout, not a section.
   const sections: {
     type: Prisma.HomeSectionCreateManyInput["type"];
@@ -402,7 +450,7 @@ async function seedHomeSections(
         subheadline: PLACEHOLDER_NOTE,
         buttonLabel: "Shop now",
         buttonHref: "/shop",
-        imageIds: [],
+        imageIds: heroImageIds,
         badge: "Placeholder customer count",
       },
     },
@@ -412,7 +460,7 @@ async function seedHomeSections(
         items: ["body-butters", "loungewear", "gift-sets"].map((slug) => ({
           collectionId: collectionIds[slug],
           title: "",
-          imageId: null,
+          imageId: bannerImages[slug],
         })),
       },
     },
