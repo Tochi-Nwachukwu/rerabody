@@ -43,22 +43,15 @@ export async function Header({ cartSlot }: { cartSlot?: ReactNode }) {
             ))}
           </nav>
         </div>
-        <Link
-          href="/"
-          className="font-heading text-xl font-semibold tracking-[0.14em] uppercase sm:text-2xl"
-        >
-          {logo ? (
-            <Image
-              src={logo.url}
-              alt={settings.store.name}
-              width={160}
-              height={48}
-              className="h-10 w-auto object-contain"
-              priority
-            />
-          ) : (
-            settings.store.name
-          )}
+        <Link href="/" className="block">
+          <Image
+            src={logo?.url ?? "/brand/rera-body-logo.png"}
+            alt={settings.store.name}
+            width={1545}
+            height={549}
+            className="h-11 w-auto object-contain sm:h-12"
+            priority
+          />
         </Link>
         <div className="flex items-center justify-end gap-0.5">
           <SearchOverlay />

@@ -4,6 +4,7 @@ import {
   Head,
   Hr,
   Html,
+  Img,
   Link,
   Preview,
   Section,
@@ -72,17 +73,15 @@ export function EmailLayout({
         }}
       >
         <Container style={{ maxWidth: "560px", margin: "0 auto", padding: "0 16px" }}>
-          <Text
-            style={{
-              ...heading,
-              fontSize: "22px",
-              textAlign: "center",
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-            }}
-          >
-            {STORE_NAME}
-          </Text>
+          <Section style={{ textAlign: "center", padding: "0 0 16px" }}>
+            <Img
+              src={absoluteUrl("/brand/rera-body-logo-email.png")}
+              alt={STORE_NAME}
+              width="160"
+              height="57"
+              style={{ margin: "0 auto" }}
+            />
+          </Section>
           <Section
             style={{
               backgroundColor: colors.card,

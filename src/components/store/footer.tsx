@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -15,9 +16,13 @@ export async function Footer({ newsletterSlot }: { newsletterSlot?: ReactNode })
     <footer className="bg-secondary/40 mt-16 border-t">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_repeat(3,1fr)]">
         <div className="flex flex-col gap-3">
-          <p className="font-heading text-2xl font-semibold tracking-[0.14em] uppercase">
-            {store.name}
-          </p>
+          <Image
+            src="/brand/rera-body-logo.png"
+            alt={store.name}
+            width={1545}
+            height={549}
+            className="h-14 w-auto self-start object-contain"
+          />
           {newsletterSlot}
           {store.contactEmail ? (
             <p className="text-sm">
