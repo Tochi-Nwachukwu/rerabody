@@ -29,9 +29,9 @@ test("shop filters by category through the URL", async ({ page }) => {
   await page.goto("/shop");
   await page
     .getByRole("navigation", { name: "Categories" })
-    .getByRole("button", { name: "Nightwear" })
+    .getByRole("button", { name: "Loungewear" })
     .click();
-  await expect(page).toHaveURL(/category=nightwear/);
+  await expect(page).toHaveURL(/category=loungewear/);
   await expect(page.getByRole("link", { name: "Satin Slip Nightdress" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Whipped Shea Body Butter" })).toHaveCount(0);
 });

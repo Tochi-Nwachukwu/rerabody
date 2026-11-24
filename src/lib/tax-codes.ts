@@ -14,7 +14,7 @@ export const TAX_CODES = [
   {
     id: "txcd_30011000",
     name: "Clothing and footwear",
-    hint: "Apparel for general use, e.g. nightwear and loungewear",
+    hint: "Apparel for general use, e.g. loungewear and sleepwear",
   },
   {
     id: "txcd_99999999",

@@ -1,6 +1,6 @@
 # Rera Body store
 
-Next.js 16 storefront and admin for Rera Body (body butters and nightwear). Postgres through Prisma 7, Better Auth, Stripe Checkout, Cloudflare R2, Resend.
+Next.js 16 storefront and admin for Rera Body (body butters and loungewear). Postgres through Prisma 7, Better Auth, Stripe Checkout, Cloudflare R2, Resend.
 
 - Build brief: `docs/BUILD_PLAN.md`, `docs/build-plan.md`
 - Choices made during the build: `docs/decisions.md`

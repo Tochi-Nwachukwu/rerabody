@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     default: "Rera Body",
     template: "%s | Rera Body",
   },
-  description: "Body butters and ladies' nightwear.",
+  description: "Body butters and loungewear.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

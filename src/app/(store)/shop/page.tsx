@@ -13,7 +13,7 @@ import { getCategories, getPublishedProductCards } from "@/server/queries/catalo
 
 export const metadata: Metadata = {
   title: "Shop all",
-  description: "Shop every body butter and nightwear piece.",
+  description: "Shop every body butter and loungewear piece.",
   alternates: { canonical: "/shop" },
 };
 

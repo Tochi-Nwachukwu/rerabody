@@ -35,7 +35,7 @@ Rera takes the [Noorvana](https://noorvanaskincare.com/) page structure almost o
 | --- | --- | --- |
 | `/` | `/` | Homepage built from CMS sections |
 | `/shop` | `/shop` | Full catalogue with category filter, sort and pagination |
-| `/collections` | `/collections` and `/collections/[slug]` | Body Butters, Nightwear, plus bundles or gift sets |
+| `/collections` | `/collections` and `/collections/[slug]` | Body Butters, Loungewear, plus bundles or gift sets |
 | `/products/[slug]` | `/products/[slug]` | Gallery with zoom, variant picker, stock, specs, size guide, reviews |
 | `/search` | `/search` | Results page, fed by the header autocomplete |
 | `/cart` | `/cart` | Line items, quantity, coupon field, totals |
@@ -48,7 +48,7 @@ Rera takes the [Noorvana](https://noorvanaskincare.com/) page structure almost o
 | `/faq` | `/faq` | CMS-managed questions |
 | `/contact` | `/contact` | Contact form that opens a support ticket |
 | `/policies` | `/terms`, `/privacy`, `/shipping-returns` | CMS rich text pages |
-| `/quiz` | not built | A skin quiz does not fit body butter and nightwear |
+| `/quiz` | not built | A skin quiz does not fit body butter and loungewear |
 | none | `/admin/*` | The dashboard, behind a role check |
 
 ### Homepage sections
@@ -56,7 +56,7 @@ Rera takes the [Noorvana](https://noorvanaskincare.com/) page structure almost o
 Each section is one CMS block that the admin can edit, reorder, hide or show. The order follows Noorvana.
 
 1. Hero with headline, button, rotating images and a customer count badge
-2. Three collection banners: Body Butters, Nightwear, Gift Sets
+2. Three collection banners: Body Butters, Loungewear, Gift Sets
 3. Best sellers grid of six products, picked by hand or by sales
 4. Why Rera, a brand statement with four points
 5. Text ticker strip
@@ -312,7 +312,7 @@ Phase 2: CSV import and export, abandoned cart emails, blog, wishlist, back-in-s
 - [ ] Which country is the Stripe account registered in, and which currency will the store charge? Stripe needs a business in a supported country. If Rera sells in naira from Nigeria, Paystack is the swap, and only the checkout module changes.
 - [ ] Is guest checkout allowed? The planning document says users create an account. Forcing registration usually costs sales, so I suggest guest checkout with an offer to create an account afterwards.
 - [ ] How is shipping priced: flat rate, by region, or free above a threshold? Which carrier, and does it give tracking links?
-- [ ] What sizes and colours does the nightwear come in, and is there a size chart?
+- [ ] What sizes and colours does the loungewear come in, and is there a size chart?
 - [ ] What is the returns and refund policy, and who writes the Terms and Privacy text?
 - [ ] Which email address should receive new order and low stock alerts?
 - [ ] Product photos, logo files and brand colours.

@@ -20,7 +20,7 @@ describe("shop filters", () => {
     card({
       name: "B",
       price: 4500,
-      categorySlug: "nightwear",
+      categorySlug: "loungewear",
       onSale: true,
       ratingAverage: 4.5,
       ratingCount: 2,
@@ -38,7 +38,7 @@ describe("shop filters", () => {
   it("filters by category, price, stock and sale", () => {
     const names = (p: Record<string, string>) =>
       applyShop(cards, parseShopParams(p)).items.map((c) => c.name);
-    expect(names({ category: "nightwear" })).toEqual(["B"]);
+    expect(names({ category: "loungewear" })).toEqual(["B"]);
     expect(names({ min: "20", max: "30", sort: "price-asc" })).toEqual(["C"]);
     expect(names({ stock: "1", sort: "price-asc" })).toEqual(["A", "B"]);
     expect(names({ sale: "1" })).toEqual(["B"]);

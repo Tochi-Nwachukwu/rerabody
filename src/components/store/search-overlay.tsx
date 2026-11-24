@@ -92,7 +92,7 @@ export function SearchOverlay() {
                 setActive((a) => Math.max(-1, a - 1));
               }
             }}
-            placeholder="Search body butters and nightwear"
+            placeholder="Search body butters and loungewear"
             aria-label="Search products"
             role="combobox"
             aria-expanded={shown.length > 0}

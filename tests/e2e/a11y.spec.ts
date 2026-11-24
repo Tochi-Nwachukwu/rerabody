@@ -25,7 +25,7 @@ const STORE_PAGES = [
   "/",
   "/shop",
   "/collections",
-  "/collections/nightwear",
+  "/collections/loungewear",
   "/products/cotton-pyjama-set",
   "/search?q=butter",
   "/offers",

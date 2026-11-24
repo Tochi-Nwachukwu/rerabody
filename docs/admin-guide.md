@@ -107,7 +107,7 @@ Sales tax is worked out by Stripe from the delivery address and added on the pay
 
 1. Your accountant tells you which states you must collect tax in.
 2. In the Stripe dashboard, go to **Tax → Registrations** and add each of those states. Stripe only collects tax in states listed there. Stripe also warns you when sales in another state get close to the point where you must register.
-3. Under **Categories**, open each category and choose its **Sales tax category**: *Skin care products* for body butters, *Clothing and footwear* for nightwear and loungewear. Products without a category are taxed as general goods.
+3. Under **Categories**, open each category and choose its **Sales tax category**: *Skin care products* for body butters, *Clothing and footwear* for loungewear. Products without a category are taxed as general goods.
 4. Ask your developer to switch tax on.
 
 **Reports** show revenue without tax, and the tax collected separately. Stripe's own tax reports (Stripe → Tax → Reports) are what you or your accountant file from.

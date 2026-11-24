@@ -110,12 +110,12 @@ async function seedOwner(ownerRoleId: string) {
 
 const CATEGORIES = [
   { slug: "body-butters", name: "Body Butters", position: 0 },
-  { slug: "nightwear", name: "Nightwear", position: 1 },
+  { slug: "loungewear", name: "Loungewear", position: 1 },
 ] as const;
 
 const COLLECTIONS = [
   { slug: "body-butters", name: "Body Butters", position: 0 },
-  { slug: "nightwear", name: "Nightwear", position: 1 },
+  { slug: "loungewear", name: "Loungewear", position: 1 },
   { slug: "gift-sets", name: "Gift Sets", position: 2 },
 ] as const;
 
@@ -156,7 +156,7 @@ function butter(
   };
 }
 
-function nightwear(
+function loungewear(
   slug: string,
   name: string,
   sku: string,
@@ -168,8 +168,8 @@ function nightwear(
   return {
     slug,
     name,
-    category: "nightwear",
-    collections: ["nightwear"],
+    category: "loungewear",
+    collections: ["loungewear"],
     options: [
       { name: "Size", values: sizes },
       { name: "Colour", values: colours },
@@ -213,12 +213,12 @@ const PRODUCTS: SeedProduct[] = [
     ),
     collections: ["body-butters", "gift-sets"],
   },
-  nightwear("satin-slip-nightdress", "Satin Slip Nightdress", "NW-SLIP", ["Ivory", "Black"], 4500),
-  nightwear("cotton-pyjama-set", "Cotton Pyjama Set", "NW-PJSET", ["Blush", "Sage"], 5200, 6000),
-  nightwear("lace-trim-cami-set", "Lace Trim Cami Set", "NW-CAMI", ["Champagne"], 3800),
+  loungewear("satin-slip-nightdress", "Satin Slip Nightdress", "NW-SLIP", ["Ivory", "Black"], 4500),
+  loungewear("cotton-pyjama-set", "Cotton Pyjama Set", "NW-PJSET", ["Blush", "Sage"], 5200, 6000),
+  loungewear("lace-trim-cami-set", "Lace Trim Cami Set", "NW-CAMI", ["Champagne"], 3800),
   {
-    ...nightwear("satin-robe", "Satin Robe", "NW-ROBE", ["Ivory", "Mocha"], 5800),
-    collections: ["nightwear", "gift-sets"],
+    ...loungewear("satin-robe", "Satin Robe", "NW-ROBE", ["Ivory", "Mocha"], 5800),
+    collections: ["loungewear", "gift-sets"],
   },
 ];
 
@@ -256,7 +256,7 @@ async function seedCatalogue() {
         description: doc(`${p.name}. ${PLACEHOLDER_NOTE}`),
         specs: doc("Placeholder specifications. Replace with real ingredients or fabric details."),
         sizeGuide:
-          p.category === "nightwear"
+          p.category === "loungewear"
             ? doc("Placeholder size guide. Replace with the real size chart.")
             : undefined,
         metaTitle: p.name,
@@ -350,7 +350,7 @@ async function seedHomeSections(
     {
       type: "COLLECTION_BANNERS",
       data: {
-        items: ["body-butters", "nightwear", "gift-sets"].map((slug) => ({
+        items: ["body-butters", "loungewear", "gift-sets"].map((slug) => ({
           collectionId: collectionIds[slug],
           title: "",
           imageId: null,
@@ -517,7 +517,7 @@ async function seedSettings() {
           links: [
             { label: "Shop all", href: "/shop" },
             { label: "Body Butters", href: "/collections/body-butters" },
-            { label: "Nightwear", href: "/collections/nightwear" },
+            { label: "Loungewear", href: "/collections/loungewear" },
             { label: "Gift Sets", href: "/collections/gift-sets" },
             { label: "Offers", href: "/offers" },
           ],
