@@ -18,7 +18,7 @@ test("a customer reviews a delivered product and it appears after the admin appr
   const email = uniqueEmail("reviewer");
   await registerAndVerify(page, email);
 
-  await addProductToCart(page, "lace-trim-cami-set");
+  await addProductToCart(page, "green-leaf-robe");
   await page.goto("/checkout");
   await fillCheckoutAddress(page);
   await page.getByRole("button", { name: "Pay now" }).click();
@@ -32,35 +32,37 @@ test("a customer reviews a delivered product and it appears after the admin appr
   await sql(`UPDATE "Order" SET status = 'DELIVERED' WHERE id = $1`, [order.id]);
 
   await page.goto(`/account/orders/${order.id}`);
-  await page.getByRole("link", { name: "Review Lace Trim Cami Set" }).click();
+  await page.getByRole("link", { name: "Review Green Leaf Robe" }).click();
   await page.getByRole("radio", { name: "5 stars" }).click();
-  await page.getByLabel("Your review").fill("Beautiful lace and a great fit. Would buy again.");
+  await page.getByLabel("Your review").fill("Beautiful print and a great fit. Would buy again.");
   await page.getByRole("button", { name: "Submit review" }).click();
   await expect(page.getByText("Your review is waiting for approval")).toBeVisible();
 
   // Hidden until approved.
-  await page.goto("/products/lace-trim-cami-set");
+  await page.goto("/products/green-leaf-robe");
   await expect(page.locator("#reviews").filter({ visible: true }).first()).toBeVisible();
-  await expect(page.locator("#reviews").getByText("Beautiful lace and a great fit")).toHaveCount(0);
+  await expect(page.locator("#reviews").getByText("Beautiful print and a great fit")).toHaveCount(
+    0,
+  );
 
   const admin = await browser.newPage();
   await signInAsOwner(admin);
   await admin.goto("/admin/reviews");
-  const card = admin.locator("li", { hasText: "Beautiful lace and a great fit" });
+  const card = admin.locator("li", { hasText: "Beautiful print and a great fit" });
   await card.getByRole("button", { name: "Approve" }).click();
   await expect(admin.getByText("Review approved and published")).toBeVisible();
   await admin.close();
 
-  await page.goto("/products/lace-trim-cami-set");
+  await page.goto("/products/green-leaf-robe");
   await expect(
     page
-      .getByText("Beautiful lace and a great fit. Would buy again.")
+      .getByText("Beautiful print and a great fit. Would buy again.")
       .filter({ visible: true })
       .first(),
   ).toBeVisible();
   await expect(page.getByText("Verified buyer").filter({ visible: true }).first()).toBeVisible();
   const [p] = await sql<{ ratingCount: number }>(
-    `SELECT "ratingCount" FROM "Product" WHERE slug = 'lace-trim-cami-set'`,
+    `SELECT "ratingCount" FROM "Product" WHERE slug = 'green-leaf-robe'`,
   );
   expect(p.ratingCount).toBeGreaterThanOrEqual(1);
 });
@@ -71,7 +73,7 @@ test("the contact form opens a ticket and the admin reply is emailed", async ({ 
   await page.getByLabel("Name").fill("Curious Customer");
   await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Subject").fill("Sizing question");
-  await page.getByLabel("Message").fill("Does the satin slip run small or true to size?");
+  await page.getByLabel("Message").fill("Does the Green Leaf robe run small or true to size?");
   await page.getByRole("button", { name: "Send message" }).click();
   await expect(page.getByText(/Your reference is T-\d+/)).toBeVisible();
   await waitForEmail(email, /We received your message/);

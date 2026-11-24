@@ -10,7 +10,7 @@ test("a guest applies a coupon and pays the discounted total", async ({ page }) 
     [newId(), code],
   );
 
-  await addProductToCart(page, "satin-robe");
+  await addProductToCart(page, "mustard-botanical-robe");
   await page.goto("/cart");
   await page.getByLabel("Promo code").fill(code.toLowerCase());
   await page.getByRole("button", { name: "Apply" }).click();

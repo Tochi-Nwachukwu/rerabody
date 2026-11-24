@@ -32,7 +32,7 @@ test("shop filters by category through the URL", async ({ page }) => {
     .getByRole("button", { name: "Loungewear" })
     .click();
   await expect(page).toHaveURL(/category=loungewear/);
-  await expect(page.getByRole("link", { name: "Satin Slip Nightdress" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Purple Geo Robe" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Vanilla Body Butter" })).toHaveCount(0);
 });
 
@@ -46,18 +46,19 @@ test("search finds a product from a misspelt query", async ({ page }) => {
 test("the header search suggests products as you type", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Search" }).click();
-  await page.getByRole("combobox", { name: "Search products" }).fill("satn slip");
-  await expect(page.getByRole("option", { name: /Satin Slip Nightdress/ })).toBeVisible();
+  await page.getByRole("combobox", { name: "Search products" }).fill("purpel geo");
+  await expect(page.getByRole("option", { name: /Purple Geo Robe/ })).toBeVisible();
 });
 
 test("product page shows variant price and stock state", async ({ page }) => {
-  await page.goto("/products/cotton-pyjama-set");
-  await expect(page.getByRole("heading", { level: 1, name: "Cotton Pyjama Set" })).toBeVisible();
-  await page.getByRole("button", { name: /^M/ }).click();
-  await page.getByRole("button", { name: /^Sage/ }).click();
+  await page.goto("/products/lemon-dream-body-butter");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Lemon Dream Body Butter" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: /^8 oz/ }).click();
   await expect(
     page.getByText(/In stock|Only \d+ left|Sold out/).filter({ visible: true }),
   ).toBeVisible();
   await expect(page).toHaveURL(/variant=/);
-  await expect(page.getByText("$52.00").filter({ visible: true }).first()).toBeVisible();
+  await expect(page.getByText("$18.00").filter({ visible: true }).first()).toBeVisible();
 });

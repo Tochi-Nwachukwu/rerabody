@@ -134,6 +134,8 @@ type SeedProduct = {
   collections: (typeof COLLECTIONS)[number]["slug"][];
   options: { name: string; values: string[] }[];
   variants: SeedVariant[];
+  /** Defaults to PUBLISHED. */
+  status?: "DRAFT" | "PUBLISHED";
 };
 
 // Real product photos, served from public/products/ (optimised WebP).
@@ -165,6 +167,24 @@ const PRODUCT_PHOTOS: Record<
     bytes: 114250,
     alt: "Rera True Blue body butter, 8 oz jar with a blue label, resting in rippling water",
   },
+  "purple-geo-robe": {
+    width: 1324,
+    height: 2000,
+    bytes: 287500,
+    alt: "Model in the Purple Geo robe, a long navy wrap robe with a lilac geometric print, holding a mug",
+  },
+  "green-leaf-robe": {
+    width: 1333,
+    height: 2000,
+    bytes: 218772,
+    alt: "Model in the Green Leaf robe, a long deep green wrap robe with a white leaf print, holding a mug",
+  },
+  "mustard-botanical-robe": {
+    width: 1333,
+    height: 2000,
+    bytes: 230648,
+    alt: "Model in the Mustard Botanical robe, a long mustard wrap robe with a white botanical print, holding a mug",
+  },
 };
 
 function butter(
@@ -193,30 +213,17 @@ function loungewear(
   slug: string,
   name: string,
   sku: string,
-  colours: string[],
+  // Most pieces are free size. Price and stock are placeholders.
   price: number,
-  compareAtPrice?: number,
+  stock: number,
 ): SeedProduct {
-  const sizes = ["S", "M", "L"];
   return {
     slug,
     name,
     category: "loungewear",
     collections: ["loungewear"],
-    options: [
-      { name: "Size", values: sizes },
-      { name: "Colour", values: colours },
-    ],
-    variants: sizes.flatMap((size, i) =>
-      colours.map((colour, j) => ({
-        sku: `${sku}-${size}-${colour.toUpperCase().slice(0, 3)}`,
-        optionValues: { Size: size, Colour: colour },
-        price,
-        compareAtPrice,
-        // Varied placeholder stock, including one sold-out and some low-stock variants.
-        stock: (i + j) % 4 === 3 ? 0 : 2 + ((i * 3 + j * 5) % 9),
-      })),
-    ),
+    options: [{ name: "Size", values: ["Free size"] }],
+    variants: [{ sku: `${sku}-FS`, optionValues: { Size: "Free size" }, price, stock }],
   };
 }
 
@@ -246,13 +253,14 @@ const PRODUCTS: SeedProduct[] = [
     ),
     collections: ["body-butters", "gift-sets"],
   },
-  loungewear("satin-slip-nightdress", "Satin Slip Nightdress", "NW-SLIP", ["Ivory", "Black"], 4500),
-  loungewear("cotton-pyjama-set", "Cotton Pyjama Set", "NW-PJSET", ["Blush", "Sage"], 5200, 6000),
-  loungewear("lace-trim-cami-set", "Lace Trim Cami Set", "NW-CAMI", ["Champagne"], 3800),
+  loungewear("purple-geo-robe", "Purple Geo Robe", "LW-PGEO", 5800, 12),
   {
-    ...loungewear("satin-robe", "Satin Robe", "NW-ROBE", ["Ivory", "Mocha"], 5800),
+    ...loungewear("green-leaf-robe", "Green Leaf Robe", "LW-GLEAF", 5800, 10),
     collections: ["loungewear", "gift-sets"],
   },
+  loungewear("mustard-botanical-robe", "Mustard Botanical Robe", "LW-MBOT", 5800, 8),
+  // No photo yet, so it stays a draft until one is added in the admin.
+  { ...loungewear("olive-floral-robe", "Olive Floral Robe", "LW-OFLO", 5800, 10), status: "DRAFT" },
 ];
 
 async function seedCatalogue() {
@@ -284,7 +292,7 @@ async function seedCatalogue() {
       create: {
         slug: p.slug,
         name: p.name,
-        status: "PUBLISHED",
+        status: p.status ?? "PUBLISHED",
         categoryId: categoryIds[p.category],
         description: doc(`${p.name}. ${PLACEHOLDER_NOTE}`),
         specs: doc("Placeholder specifications. Replace with real ingredients or fabric details."),
@@ -453,7 +461,7 @@ async function seedHomeSections(
     {
       type: "FEATURED_PRODUCT",
       data: {
-        productId: productIds["satin-slip-nightdress"],
+        productId: productIds["purple-geo-robe"],
         badge: "Just in",
         body: PLACEHOLDER_NOTE,
       },
