@@ -136,6 +136,37 @@ type SeedProduct = {
   variants: SeedVariant[];
 };
 
+// Real product photos, served from public/products/ (optimised WebP).
+const PRODUCT_PHOTOS: Record<
+  string,
+  { width: number; height: number; bytes: number; alt: string }
+> = {
+  "vanilla-body-butter": {
+    width: 1441,
+    height: 2000,
+    bytes: 132150,
+    alt: "Rera Vanilla body butter, 16 oz jar with a gold label, among dried roses",
+  },
+  "lemon-dream-body-butter": {
+    width: 2000,
+    height: 1739,
+    bytes: 201460,
+    alt: "Rera Lemon Dream body butter, 16 oz jar on a wooden slab with lemons and almonds",
+  },
+  "cranberry-fig-lavender-body-butter": {
+    width: 2000,
+    height: 1095,
+    bytes: 164320,
+    alt: "Rera Cranberry Fig + Lavender body butter, 16 oz jar among dried grasses and seed pods",
+  },
+  "true-blue-body-butter": {
+    width: 1351,
+    height: 2000,
+    bytes: 114250,
+    alt: "Rera True Blue body butter, 8 oz jar with a blue label, resting in rippling water",
+  },
+};
+
 function butter(
   slug: string,
   name: string,
@@ -269,6 +300,24 @@ async function seedCatalogue() {
       },
     });
     productIds[p.slug] = product.id;
+
+    const photo = PRODUCT_PHOTOS[p.slug];
+    if (photo) {
+      const key = `static/products/${p.slug}.webp`;
+      const media = await prisma.media.upsert({
+        where: { key },
+        update: {},
+        create: { key, url: `/products/${p.slug}.webp`, mimeType: "image/webp", ...photo },
+      });
+      const linked = await prisma.productImage.findFirst({
+        where: { productId: product.id, mediaId: media.id },
+      });
+      if (!linked) {
+        await prisma.productImage.create({
+          data: { productId: product.id, mediaId: media.id, position: 0, isCover: true },
+        });
+      }
+    }
 
     for (const [position, slug] of p.collections.entries()) {
       await prisma.collectionProduct.upsert({

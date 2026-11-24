@@ -55,3 +55,6 @@ next-env.d.ts
 
 # local uploads (STORAGE_DRIVER=local)
 /.uploads/
+
+# Original full-size product photos (optimised copies live in public/products/)
+/product_images/
