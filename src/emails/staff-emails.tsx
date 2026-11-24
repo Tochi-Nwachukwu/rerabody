@@ -67,9 +67,9 @@ export function LowStock({
   );
 }
 LowStock.PreviewProps = {
-  productName: "Whipped Shea Body Butter",
-  variantLabel: "200 ml",
-  sku: "BB-SHEA-200",
+  productName: "Vanilla Body Butter",
+  variantLabel: "16 oz",
+  sku: "BB-VAN-16",
   stock: 2,
   threshold: 5,
   adminUrl: "http://localhost:3000/admin/inventory",

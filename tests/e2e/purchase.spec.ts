@@ -6,7 +6,7 @@ import { addProductToCart, checkoutAsGuest, fillCheckoutAddress, uniqueEmail } f
 test("a guest buys a product with the fake provider and sees the order as paid", async ({
   page,
 }) => {
-  await addProductToCart(page, "unscented-mango-body-butter");
+  await addProductToCart(page, "cranberry-fig-lavender-body-butter");
   await page.getByRole("dialog").getByRole("link", { name: "Checkout" }).click();
   await expect(page.getByRole("heading", { name: "Checkout" })).toBeVisible();
 
@@ -24,12 +24,12 @@ test("a guest buys a product with the fake provider and sees the order as paid",
 });
 
 test("cancelling on the payment page keeps the cart", async ({ page }) => {
-  await addProductToCart(page, "whipped-shea-body-butter");
+  await addProductToCart(page, "vanilla-body-butter");
   await page.goto("/checkout");
   await fillCheckoutAddress(page, uniqueEmail("cancel"));
   await page.getByRole("button", { name: "Pay now" }).click();
   await page.getByRole("button", { name: "Simulate expired session" }).click();
   await expect(page.getByRole("heading", { name: "Payment not completed" })).toBeVisible();
   await page.goto("/cart");
-  await expect(page.getByRole("link", { name: "Whipped Shea Body Butter" }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "Vanilla Body Butter" }).first()).toBeVisible();
 });

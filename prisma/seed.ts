@@ -148,10 +148,10 @@ function butter(
     name,
     category: "body-butters",
     collections: ["body-butters"],
-    options: [{ name: "Size", values: ["100 ml", "200 ml"] }],
+    options: [{ name: "Size", values: ["8 oz", "16 oz"] }],
     variants: [
-      { sku: `${sku}-100`, optionValues: { Size: "100 ml" }, price: prices[0], stock: stock[0] },
-      { sku: `${sku}-200`, optionValues: { Size: "200 ml" }, price: prices[1], stock: stock[1] },
+      { sku: `${sku}-8`, optionValues: { Size: "8 oz" }, price: prices[0], stock: stock[0] },
+      { sku: `${sku}-16`, optionValues: { Size: "16 oz" }, price: prices[1], stock: stock[1] },
     ],
   };
 }
@@ -188,29 +188,17 @@ function loungewear(
 }
 
 const PRODUCTS: SeedProduct[] = [
-  butter("whipped-shea-body-butter", "Whipped Shea Body Butter", "BB-SHEA", [1800, 2900], [40, 25]),
+  butter("vanilla-body-butter", "Vanilla Body Butter", "BB-VAN", [1800, 2900], [40, 25]),
+  butter("lemon-dream-body-butter", "Lemon Dream Body Butter", "BB-LEM", [1800, 2900], [30, 3]),
   butter(
-    "cocoa-vanilla-body-butter",
-    "Cocoa and Vanilla Body Butter",
-    "BB-COCO",
-    [1800, 2900],
-    [30, 3],
-  ),
-  butter(
-    "unscented-mango-body-butter",
-    "Unscented Mango Body Butter",
-    "BB-MANG",
+    "cranberry-fig-lavender-body-butter",
+    "Cranberry Fig + Lavender Body Butter",
+    "BB-CFL",
     [1600, 2600],
     [50, 20],
   ),
   {
-    ...butter(
-      "lavender-night-body-butter",
-      "Lavender Night Body Butter",
-      "BB-LAVN",
-      [2000, 3200],
-      [0, 12],
-    ),
+    ...butter("true-blue-body-butter", "True Blue Body Butter", "BB-TRB", [2000, 3200], [0, 12]),
     collections: ["body-butters", "gift-sets"],
   },
   loungewear("satin-slip-nightdress", "Satin Slip Nightdress", "NW-SLIP", ["Ivory", "Black"], 4500),
@@ -394,7 +382,7 @@ async function seedHomeSections(
     {
       type: "FEATURED_PRODUCT",
       data: {
-        productId: productIds["whipped-shea-body-butter"],
+        productId: productIds["vanilla-body-butter"],
         badge: "Most loved",
         body: PLACEHOLDER_NOTE,
       },

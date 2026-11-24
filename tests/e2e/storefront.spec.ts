@@ -15,7 +15,7 @@ test("published products are listed and drafts are not", async ({ page }) => {
   );
 
   await page.goto("/shop");
-  await expect(page.getByRole("link", { name: "Whipped Shea Body Butter" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Vanilla Body Butter" })).toBeVisible();
   await expect(page.getByText(`Hidden Draft ${slug}`)).toHaveCount(0);
 
   // Streamed (partial prerender) pages cannot change the status code after the shell is sent;
@@ -33,12 +33,14 @@ test("shop filters by category through the URL", async ({ page }) => {
     .click();
   await expect(page).toHaveURL(/category=loungewear/);
   await expect(page.getByRole("link", { name: "Satin Slip Nightdress" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Whipped Shea Body Butter" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Vanilla Body Butter" })).toHaveCount(0);
 });
 
 test("search finds a product from a misspelt query", async ({ page }) => {
   await page.goto("/search?q=lavendr%20buter");
-  await expect(page.getByRole("link", { name: "Lavender Night Body Butter" })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Cranberry Fig + Lavender Body Butter" }),
+  ).toBeVisible();
 });
 
 test("the header search suggests products as you type", async ({ page }) => {

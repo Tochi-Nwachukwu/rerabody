@@ -106,8 +106,8 @@ export const sampleOrder: EmailOrder = {
   currency: "USD",
   items: [
     {
-      name: "Whipped Shea Body Butter",
-      variantLabel: "200 ml",
+      name: "Vanilla Body Butter",
+      variantLabel: "16 oz",
       quantity: 1,
       lineTotal: 2900,
       imageUrl: null,

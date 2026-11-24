@@ -170,7 +170,7 @@ export function OrderDeliveredReview({
 OrderDeliveredReview.PreviewProps = {
   name: "Ada",
   order: sampleOrder,
-  reviewLinks: [{ name: "Whipped Shea Body Butter", url: "http://localhost:3000/reviews/new" }],
+  reviewLinks: [{ name: "Vanilla Body Butter", url: "http://localhost:3000/reviews/new" }],
 };
 
 export function OrderCancelled({ name, order, refunded }: Base & { refunded: number }) {

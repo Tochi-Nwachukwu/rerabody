@@ -12,7 +12,7 @@ import {
 test("admin walks an order from paid to delivered; one event and one email per step, even when double-clicked", async ({
   page,
 }) => {
-  await addProductToCart(page, "cocoa-vanilla-body-butter");
+  await addProductToCart(page, "lemon-dream-body-butter");
   const email = uniqueEmail("fulfil");
   const number = await checkoutAsGuest(page, email);
   const [{ id }] = await sql<{ id: string }>(`SELECT id FROM "Order" WHERE number = $1`, [number]);
@@ -85,7 +85,7 @@ test("admin walks an order from paid to delivered; one event and one email per s
 });
 
 test("a refund from the admin restocks when ticked", async ({ page }) => {
-  await addProductToCart(page, "unscented-mango-body-butter");
+  await addProductToCart(page, "cranberry-fig-lavender-body-butter");
   const number = await checkoutAsGuest(page, uniqueEmail("refund"));
   const [{ id }] = await sql<{ id: string }>(`SELECT id FROM "Order" WHERE number = $1`, [number]);
   const [{ variantId }] = await sql<{ variantId: string }>(
