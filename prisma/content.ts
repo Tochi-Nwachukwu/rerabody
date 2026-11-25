@@ -71,6 +71,8 @@ export const COLLECTION_COPY: Record<string, string> = {
 };
 
 const BUTTER_SPECS = rich(
+  "- Made by hand from organic, natural and unrefined butters and oils",
+  "- Prepared fresh for every order",
   "- Sizes: 3 oz, 8 oz and 16 oz jars",
   "- For use on skin only. If your skin is sensitive, try a little on your inner arm first.",
   "- Keep the lid on and store somewhere cool, out of direct sun.",
@@ -192,7 +194,7 @@ export const HOME_COPY = {
   hero: {
     headline: "Rich Body Butters & Elegant Women’s Loungewear.",
     subheadline:
-      "Nourish and soften your skin with whipped botanical body butters, paired with breathable robes designed for everyday luxury and effortless gifting.",
+      "Nourish and soften your skin with whipped botanical body butters, paired with breathable robes designed for everyday luxury.",
     badge: "",
   },
   why: {
@@ -224,19 +226,19 @@ export const HOME_COPY = {
     body: "Every scent in every size, plus the robes. Start anywhere.",
   },
   about: {
-    heading: "About Rera",
-    body: "Rera is a small brand with a short list: body butter for your skin, and robes for the hours you spend at home. We'd rather do a few things well than fill a page with products.\n\nIf you have a question about anything here, send us a message through the contact page.",
+    heading: "Your skin, but better.",
+    body: "Rera is dedicated to providing organic skincare for women. For over 15 years, we have made body butters by hand from natural, unrefined butters and oils, prepared fresh for every order. Our mission is to give women skincare they can trust, with ingredients that are good for the skin.",
   },
   steps: {
     heading: "How to use",
     steps: [
       {
         title: "Start with damp skin",
-        body: "Right after a shower or bath, pat yourself dry but leave your skin a little damp. The butter spreads further that way.",
+        body: "Right after a shower or bath, pat yourself dry but leave your skin a little damp.",
       },
       {
         title: "Warm a little in your hands",
-        body: "Scoop out a small amount and rub your palms together for a few seconds. It softens as it warms.",
+        body: "Scoop out a small amount and rub your palms together for a few seconds.",
       },
       {
         title: "Work it in",

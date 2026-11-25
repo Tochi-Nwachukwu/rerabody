@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 
 export const SITE_TITLE = "Rera Body | Rich Body Butters & Elegant Women’s Loungewear";
 export const SITE_DESCRIPTION =
-  "Nourish and soften your skin with whipped botanical body butters, paired with breathable robes designed for everyday luxury and effortless gifting.";
+  "Nourish and soften your skin with whipped botanical body butters, paired with breathable robes designed for everyday luxury.";
 
 /** Default share image (1200x630), cropped from the body butter carousel photo. */
 export const SHARE_IMAGE = {

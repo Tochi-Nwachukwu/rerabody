@@ -114,7 +114,7 @@ async function homepage() {
           Object.assign(d, HOME_COPY.shopAll);
           d.imageId ??= await cover("mustard-botanical-robe");
           d.imagePosition = "left";
-        } else if (d.heading === "Our story") {
+        } else if (d.heading === "Our story" || d.heading === "About Rera") {
           Object.assign(d, HOME_COPY.about);
           d.imageId ??= await cover("true-blue-body-butter");
         }

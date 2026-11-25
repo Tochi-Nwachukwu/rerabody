@@ -217,7 +217,7 @@ All storefront text lives in `prisma/content.ts`. `prisma/apply-content.ts` writ
 | Terms | No governing law or company legal name, because neither is known | Terms |
 | Privacy | Describes what the code actually does: Stripe payments and tax, Resend email, cart and sign-in cookies, no analytics or ad trackers | Privacy |
 | True Blue scent | Not stated anywhere; the copy describes the jar, not the scent | True Blue product page |
-| Ingredients and fabric | Not stated. Butter specs list sizes, use and storage; robe specs list the features shown in the product photos | Product pages |
+| Ingredients and fabric | From the owner: body butters are made by hand from organic, natural, unrefined butters and oils, fresh for every order (in the Details tab). Exact ingredients per scent and robe fabric are still not stated | Product pages |
 | Robe measurements | None; the size guide offers help through the contact page | Robe size guide |
 | Contact email | Cleared (was `hello@example.com`), so the contact page shows only the form until the owner sets one in Settings | Contact page |
 | Vanilla shimmer | Taken from the 16 oz label ("16oz shimmer"); assumed for every size | Vanilla product page, homepage feature |

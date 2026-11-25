@@ -71,13 +71,22 @@ function Hero({ d, ctx }: { d: SectionData<"HERO">; ctx: Ctx }) {
     <section className="bg-secondary relative flex min-h-[70svh] items-end overflow-hidden">
       {images.length ? <HeroRotator images={images} /> : null}
       {images.length ? (
-        <div
-          className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/15 to-transparent"
-          aria-hidden
-        />
+        <>
+          {/* Darkens the image behind the text: a side fade where the text sits, plus a bottom fade. */}
+          <div
+            className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/35 to-black/5"
+            aria-hidden
+          />
+          <div
+            className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent"
+            aria-hidden
+          />
+          {/* On narrow screens the text covers most of the image, so tint all of it. */}
+          <div className="absolute inset-0 bg-black/25 sm:hidden" aria-hidden />
+        </>
       ) : null}
       <div
-        className={`relative mx-auto flex w-full max-w-7xl flex-col items-start gap-4 px-4 pt-24 pb-14 sm:px-6 ${images.length ? "text-white" : ""}`}
+        className={`relative mx-auto flex w-full max-w-7xl flex-col items-start gap-4 px-4 pt-24 pb-14 sm:px-6 ${images.length ? "text-white [text-shadow:0_1px_14px_rgb(0_0_0/0.35)]" : ""}`}
       >
         {d.eyebrow ? <p className="text-xs tracking-[0.25em] uppercase">{d.eyebrow}</p> : null}
         <Heading className="font-heading max-w-2xl text-5xl leading-[1.05] sm:text-6xl">
