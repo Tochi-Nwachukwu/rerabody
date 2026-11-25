@@ -207,9 +207,10 @@ export const HOME_COPY = {
     ],
   },
   ticker: [
-    "Four scents: Vanilla, Lemon Dream, Cranberry Fig + Lavender and True Blue",
-    "Every body butter comes in 3, 8 and 16 oz jars",
-    "Robes in one free size, with deep pockets",
+    "Choose from a variety of scents: Lemon Dream, Cranberry Fig + Lavender, Vanilla and True Blue",
+    "Breathable loungewear in a variety of prints",
+    "Made with natural ingredients",
+    "Customize your recipe",
   ],
   featured: {
     "vanilla-body-butter": {
