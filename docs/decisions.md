@@ -201,3 +201,24 @@ Choices made where the build plan was silent or a dependency forced a change. Ne
 | Reports | Revenue and average order exclude sales tax; "Sales tax collected" is shown separately. Partial refunds are assumed to return tax in proportion. Coupon "order revenue" excludes tax; customer spend includes it (what they paid) | Tax is collected for the state, not earned |
 | Refunds | Refunds go through Stripe as before. Stripe's tax reports count a paid Checkout Session as tax collected and a refund of it as a decrease (https://docs.stripe.com/tax/reports). Stripe does not document how a partial refund on a Checkout payment splits between price and tax; test one in the sandbox before relying on the split | No store-side tax ledger; Stripe's reports are what gets filed |
 | Location source | The Customer's saved shipping address ("If you don't collect the shipping address, Checkout uses the Customer's existing shipping address", https://docs.stripe.com/tax/checkout/page) | Confirms no extra Checkout parameters are needed |
+
+## Store copy
+
+All storefront text lives in `prisma/content.ts`. `prisma/apply-content.ts` writes it into an existing database, replacing only fields that still hold placeholder text. The copy states only what the product names, labels and photos show. Where a fact was needed and not known, a conservative default was used. The owner should confirm or correct each of these:
+
+| Topic | Default used | Where it appears |
+| --- | --- | --- |
+| Shipping area | United States only (checkout still accepts other countries) | Shipping and returns, FAQ |
+| Processing time | Orders packed within 1 to 3 business days | Shipping and returns, FAQ |
+| Delivery times and prices | Standard 3 to 5 business days ($3.95), Express 1 to 2 ($7.95). Prices are still placeholders | Checkout, Shipping and returns, FAQ |
+| Return window | 30 days from delivery. Robes unworn, unwashed, tags on. Body butter unopened only. Customer pays return postage unless the item was wrong or damaged | Shipping and returns, FAQ |
+| Damaged items | Report within 7 days with a photo; replacement or full refund | Shipping and returns |
+| Refund timing | 5 to 10 business days after the return is checked | Shipping and returns |
+| Terms | No governing law or company legal name, because neither is known | Terms |
+| Privacy | Describes what the code actually does: Stripe payments and tax, Resend email, cart and sign-in cookies, no analytics or ad trackers | Privacy |
+| True Blue scent | Not stated anywhere; the copy describes the jar, not the scent | True Blue product page |
+| Ingredients and fabric | Not stated. Butter specs list sizes, use and storage; robe specs list the features shown in the product photos | Product pages |
+| Robe measurements | None; the size guide offers help through the contact page | Robe size guide |
+| Contact email | Cleared (was `hello@example.com`), so the contact page shows only the form until the owner sets one in Settings | Contact page |
+| Vanilla shimmer | Taken from the 16 oz label ("16oz shimmer"); assumed for every size | Vanilla product page, homepage feature |
+| "Most loved" badge | Replaced with "With shimmer"; there were no sales figures to back it | Homepage |

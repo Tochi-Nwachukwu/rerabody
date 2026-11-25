@@ -1,12 +1,9 @@
 /**
  * Rera Body seed script.
  *
- * ============================================================================
- * PLACEHOLDER CONTENT. Every product name, description, price, stock level,
- * shipping rate, homepage text, policy page, FAQ answer and setting below is
- * invented for development. None of it is real Rera Body copy, pricing or
- * policy. Replace all of it with the client's real content before launch.
- * ============================================================================
+ * Product names, sizes and photos are Rera Body's own. Store copy lives in
+ * prisma/content.ts. Prices, stock and shipping rates are still placeholders
+ * (see docs/decisions.md, "Store copy").
  *
  * Safe to run more than once: catalogue rows are upserted by slug or SKU,
  * and content tables (homepage sections, FAQ) are only filled when empty.
@@ -22,6 +19,16 @@ import { Prisma } from "../src/generated/prisma/client";
 import { type SectionType, sectionSchemas } from "../src/lib/home-sections";
 import { createPrismaClient } from "../src/server/prisma";
 import { DEFAULT_ROLE_PERMISSIONS, OWNER_ROLE_NAME } from "../src/server/permissions";
+import {
+  CATEGORY_COPY,
+  COLLECTION_COPY,
+  FAQ_COPY,
+  HOME_COPY,
+  PAGE_COPY,
+  PRODUCT_COPY,
+  SEO_DESCRIPTION,
+  SHIPPING_METHODS,
+} from "./content";
 
 const seedEnv = z
   .object({
@@ -33,19 +40,6 @@ const seedEnv = z
   .parse(process.env);
 
 const prisma = createPrismaClient(seedEnv.DIRECT_URL ?? seedEnv.DATABASE_URL);
-
-const PLACEHOLDER_NOTE = "Placeholder text. Replace with real Rera Body copy before launch.";
-
-/** Minimal Tiptap document made of paragraphs. */
-function doc(...paragraphs: string[]): Prisma.InputJsonValue {
-  return {
-    type: "doc",
-    content: paragraphs.map((text) => ({
-      type: "paragraph",
-      content: [{ type: "text", text }],
-    })),
-  };
-}
 
 // ---------------------------------------------------------------------------
 // Roles, permissions and the owner account
@@ -269,7 +263,7 @@ async function seedCatalogue() {
     const row = await prisma.category.upsert({
       where: { slug: c.slug },
       update: {},
-      create: { ...c, description: PLACEHOLDER_NOTE },
+      create: { ...c, description: CATEGORY_COPY[c.slug] },
     });
     categoryIds[c.slug] = row.id;
   }
@@ -279,7 +273,7 @@ async function seedCatalogue() {
     const row = await prisma.collection.upsert({
       where: { slug: c.slug },
       update: {},
-      create: { ...c, description: PLACEHOLDER_NOTE },
+      create: { ...c, description: COLLECTION_COPY[c.slug] },
     });
     collectionIds[c.slug] = row.id;
   }
@@ -294,14 +288,11 @@ async function seedCatalogue() {
         name: p.name,
         status: p.status ?? "PUBLISHED",
         categoryId: categoryIds[p.category],
-        description: doc(`${p.name}. ${PLACEHOLDER_NOTE}`),
-        specs: doc("Placeholder specifications. Replace with real ingredients or fabric details."),
-        sizeGuide:
-          p.category === "loungewear"
-            ? doc("Placeholder size guide. Replace with the real size chart.")
-            : undefined,
+        description: PRODUCT_COPY[p.slug].description,
+        specs: PRODUCT_COPY[p.slug].specs,
+        sizeGuide: PRODUCT_COPY[p.slug].sizeGuide,
         metaTitle: p.name,
-        metaDescription: `${p.name}. Placeholder meta description.`,
+        metaDescription: PRODUCT_COPY[p.slug].metaDescription,
         options: {
           create: p.options.map((o, position) => ({ name: o.name, values: o.values, position })),
         },
@@ -350,7 +341,7 @@ async function seedCatalogue() {
           stock: v.stock,
           inventoryMovements:
             v.stock > 0
-              ? { create: { delta: v.stock, reason: "RESTOCK", note: "Placeholder seed stock" } }
+              ? { create: { delta: v.stock, reason: "RESTOCK", note: "Opening stock" } }
               : undefined,
         },
       });
@@ -366,22 +357,7 @@ async function seedCatalogue() {
 
 async function seedShipping() {
   if ((await prisma.shippingMethod.count()) > 0) return;
-  await prisma.shippingMethod.createMany({
-    data: [
-      {
-        name: "Standard delivery (placeholder)",
-        price: 395,
-        region: "Domestic",
-        estimate: "3 to 5 working days",
-      },
-      {
-        name: "Express delivery (placeholder)",
-        price: 795,
-        region: "Domestic",
-        estimate: "1 to 2 working days",
-      },
-    ],
-  });
+  await prisma.shippingMethod.createMany({ data: SHIPPING_METHODS });
 }
 
 async function seedHomeSections(
@@ -446,12 +422,12 @@ async function seedHomeSections(
     {
       type: "HERO",
       data: {
-        headline: "Placeholder hero headline",
-        subheadline: PLACEHOLDER_NOTE,
+        headline: HOME_COPY.hero.headline,
+        subheadline: HOME_COPY.hero.subheadline,
         buttonLabel: "Shop now",
         buttonHref: "/shop",
         imageIds: heroImageIds,
-        badge: "Placeholder customer count",
+        badge: HOME_COPY.hero.badge,
       },
     },
     {
@@ -477,41 +453,28 @@ async function seedHomeSections(
     {
       type: "TEXT_IMAGE",
       data: {
-        heading: "Why Rera",
-        body: PLACEHOLDER_NOTE,
-        points: [
-          "Placeholder point one",
-          "Placeholder point two",
-          "Placeholder point three",
-          "Placeholder point four",
-        ],
-        imageId: null,
+        ...HOME_COPY.why,
+        imageId: await coverOf("cranberry-fig-lavender-body-butter"),
       },
     },
     {
       type: "TICKER",
       data: {
-        items: [
-          "Placeholder ticker message one",
-          "Placeholder ticker message two",
-          "Placeholder ticker message three",
-        ],
+        items: HOME_COPY.ticker,
       },
     },
     {
       type: "FEATURED_PRODUCT",
       data: {
         productId: productIds["vanilla-body-butter"],
-        badge: "Most loved",
-        body: PLACEHOLDER_NOTE,
+        ...HOME_COPY.featured["vanilla-body-butter"],
       },
     },
     {
       type: "FEATURED_PRODUCT",
       data: {
         productId: productIds["purple-geo-robe"],
-        badge: "Just in",
-        body: PLACEHOLDER_NOTE,
+        ...HOME_COPY.featured["purple-geo-robe"],
       },
     },
     {
@@ -527,26 +490,21 @@ async function seedHomeSections(
     {
       type: "TEXT_IMAGE",
       data: {
-        heading: "Shop all",
-        body: PLACEHOLDER_NOTE,
+        ...HOME_COPY.shopAll,
         buttonLabel: "Shop all",
         buttonHref: "/shop",
-        imageId: null,
+        imageId: await coverOf("mustard-botanical-robe"),
+        imagePosition: "left",
       },
     },
     {
       type: "TEXT_IMAGE",
-      data: { heading: "Our story", body: PLACEHOLDER_NOTE, imageId: null },
+      data: { ...HOME_COPY.about, imageId: await coverOf("true-blue-body-butter") },
     },
     {
       type: "STEPS",
       data: {
-        heading: "How to use",
-        steps: [
-          { title: "Placeholder step one", body: PLACEHOLDER_NOTE },
-          { title: "Placeholder step two", body: PLACEHOLDER_NOTE },
-          { title: "Placeholder step three", body: PLACEHOLDER_NOTE },
-        ],
+        ...HOME_COPY.steps,
       },
     },
     {
@@ -555,7 +513,7 @@ async function seedHomeSections(
     },
     {
       type: "NEWSLETTER",
-      data: { heading: "Join the list", body: PLACEHOLDER_NOTE },
+      data: HOME_COPY.newsletter,
     },
   ];
 
@@ -564,30 +522,23 @@ async function seedHomeSections(
       type: s.type,
       position,
       isVisible: true,
-      // Throws if the placeholder data does not match the section schema.
+      // Throws if the data does not match the section schema.
       data: sectionSchemas[s.type as SectionType].parse(s.data) as Prisma.InputJsonValue,
     })),
   });
 }
 
 async function seedPages() {
-  const pages = [
-    { slug: "terms", title: "Terms and conditions" },
-    { slug: "privacy", title: "Privacy policy" },
-    { slug: "shipping-returns", title: "Shipping and returns" },
-  ];
-  for (const p of pages) {
+  for (const [slug, p] of Object.entries(PAGE_COPY)) {
     await prisma.page.upsert({
-      where: { slug: p.slug },
+      where: { slug },
       update: {},
       create: {
-        slug: p.slug,
+        slug,
         title: p.title,
-        body: doc(
-          "This page is a placeholder stub. It is not a real policy.",
-          "The store owner must replace this text with the real policy before launch.",
-        ),
+        body: p.body,
         metaTitle: p.title,
+        metaDescription: p.metaDescription,
         publishedAt: new Date(),
       },
     });
@@ -596,23 +547,15 @@ async function seedPages() {
 
 async function seedFaqs() {
   if ((await prisma.faq.count()) > 0) return;
-  const answer = "Placeholder answer. Replace with the store's real policy before launch.";
-  const faqs = [
-    { topic: "Orders", question: "How do I track my order?" },
-    { topic: "Orders", question: "Can I change or cancel my order?" },
-    { topic: "Shipping", question: "How long does delivery take?" },
-    { topic: "Shipping", question: "Where do you deliver?" },
-    { topic: "Products", question: "How should I store my body butter?" },
-    { topic: "Returns", question: "What is your returns policy?" },
-  ];
-  await prisma.faq.createMany({ data: faqs.map((f, position) => ({ ...f, answer, position })) });
+  await prisma.faq.createMany({ data: FAQ_COPY.map((f, position) => ({ ...f, position })) });
 }
 
 async function seedSettings() {
   const settings: Record<string, Prisma.InputJsonValue> = {
     store: {
       name: "Rera Body",
-      contactEmail: "hello@example.com",
+      // Set the real address in Admin > Settings. Empty hides it on the contact page.
+      contactEmail: "",
       contactPhone: "",
       logoMediaId: null,
     },
@@ -647,7 +590,7 @@ async function seedSettings() {
       ],
     },
     notifications: { adminAlertEmail: "orders-alerts@example.com", defaultLowStockThreshold: 5 },
-    seo: { defaultTitle: "Rera Body", defaultDescription: "Placeholder store description." },
+    seo: { defaultTitle: "Rera Body", defaultDescription: SEO_DESCRIPTION },
     tracking: { carriers: [] },
     chatWidget: { enabled: false, provider: "tawk", siteId: "" },
   };
@@ -669,7 +612,7 @@ async function main() {
   await seedFaqs();
   await seedSettings();
 
-  console.log(`Seed complete. Owner account: ${owner.email}. All content is placeholder.`);
+  console.log(`Seed complete. Owner account: ${owner.email}. Prices and stock are placeholders.`);
 }
 
 main()

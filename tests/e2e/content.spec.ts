@@ -77,5 +77,5 @@ test("policy pages and FAQ render", async ({ page }) => {
     page.getByRole("heading", { level: 1, name: "Frequently asked questions" }),
   ).toBeVisible();
   await page.getByText("How do I track my order?").click();
-  await expect(page.getByText(/Placeholder answer/).first()).toBeVisible();
+  await expect(page.getByText(/Your shipping email has a tracking link/).first()).toBeVisible();
 });
