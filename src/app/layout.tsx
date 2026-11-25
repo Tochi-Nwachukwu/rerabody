@@ -4,6 +4,8 @@ import { Toaster } from "@/components/ui/sonner";
 
 import "./globals.css";
 
+import { SHARE_IMAGE, SITE_DESCRIPTION, SITE_TITLE } from "@/lib/seo";
+
 const sans = Geist({
   variable: "--font-sans",
   subsets: ["latin"],
@@ -23,11 +25,30 @@ const serif = Cormorant_Garamond({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
+  applicationName: "Rera Body",
   title: {
-    default: "Rera Body",
+    default: SITE_TITLE,
     template: "%s | Rera Body",
   },
-  description: "Body butters and loungewear.",
+  description: SITE_DESCRIPTION,
+  keywords: [
+    "body butter",
+    "whipped body butter",
+    "botanical body butter",
+    "women's loungewear",
+    "robes",
+    "self-care gifts",
+    "Rera Body",
+  ],
+  // Fallback for pages without their own share tags: site name and image only, so a
+  // shared page never shows the homepage title. Pages with their own use shareMetadata().
+  openGraph: {
+    type: "website",
+    siteName: "Rera Body",
+    locale: "en_US",
+    images: [SHARE_IMAGE],
+  },
+  twitter: { card: "summary_large_image", images: [SHARE_IMAGE] },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

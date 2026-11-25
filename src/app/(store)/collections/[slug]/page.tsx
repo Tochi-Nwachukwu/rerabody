@@ -12,6 +12,7 @@ import { env } from "@/env";
 import { minorUnitDigits } from "@/lib/money";
 import { applyShop, parseShopParams } from "@/lib/shop-filter";
 import { getCollectionBySlug, getPublishedProductCards } from "@/server/queries/catalog";
+import { shareMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -23,11 +24,12 @@ export async function generateMetadata({
     title: c.name,
     description: c.description ?? `Shop the ${c.name} collection.`,
     alternates: { canonical: `/collections/${c.slug}` },
-    openGraph: {
+    ...shareMetadata({
       title: c.name,
       description: c.description ?? undefined,
-      images: c.banner ? [{ url: c.banner.url }] : undefined,
-    },
+      url: `/collections/${c.slug}`,
+      images: c.banner ? [{ url: c.banner.url, alt: c.banner.alt }] : undefined,
+    }),
   };
 }
 

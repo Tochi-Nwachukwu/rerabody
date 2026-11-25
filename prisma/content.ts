@@ -190,19 +190,18 @@ export const SHIPPING_METHODS = [
 
 export const HOME_COPY = {
   hero: {
-    headline: "Body butter, a good robe, and nowhere to be.",
+    headline: "Rich Body Butters & Elegant Women’s Loungewear.",
     subheadline:
-      "Four body butters, from Lemon Dream to True Blue, and long wrap robes with deep pockets. Keep them for yourself or send them as a gift.",
+      "Nourish and soften your skin with whipped botanical body butters, paired with breathable robes designed for everyday luxury and effortless gifting.",
     badge: "",
   },
   why: {
     heading: "Why Rera",
-    body: "We keep it small: four body butters and a few robes. Everything goes together, so putting together a gift, or a slow Sunday, takes no thought at all.",
+    body: "We care about what goes on your skin. Every jar is made at home from organic butters and natural oils, with over 15 years of hands-on experience behind it.",
     points: [
-      "Four scents, from bright Lemon Dream to soft Cranberry Fig + Lavender",
-      "Three jar sizes. Try a 3 oz before you commit to the 16.",
-      "Robes in one free size with a relaxed fit",
-      "Sleeves that roll up and button in place, and pockets that hold things",
+      "Rich organic butters and natural oils",
+      "Made fresh when you order",
+      "Breathable robes made for comfort",
     ],
   },
   ticker: [
@@ -251,8 +250,8 @@ export const HOME_COPY = {
   },
 };
 
-export const SEO_DESCRIPTION =
-  "Rera Body: rich body butters in four scents and long wrap robes in bold prints. Body butter in 3, 8 and 16 oz jars, robes in one free size.";
+// Homepage title and the site's default search and share text.
+export { SITE_DESCRIPTION as SEO_DESCRIPTION, SITE_TITLE as SEO_TITLE } from "../src/lib/seo";
 
 // ---------------------------------------------------------------------------
 // Pages and FAQ

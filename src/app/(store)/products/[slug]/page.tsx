@@ -14,6 +14,7 @@ import { env } from "@/env";
 import { minorUnitDigits } from "@/lib/money";
 import { absoluteUrl } from "@/lib/site";
 import { getStaff } from "@/server/auth/session";
+import { shareMetadata } from "@/lib/seo";
 import {
   type ProductDetail,
   getProductBySlug,
@@ -32,12 +33,12 @@ export async function generateMetadata({
     title: p.metaTitle || p.name,
     description,
     alternates: { canonical: `/products/${p.slug}` },
-    openGraph: {
-      type: "website",
+    ...shareMetadata({
       title: p.metaTitle || p.name,
       description,
+      url: `/products/${p.slug}`,
       images: p.images.slice(0, 4).map((i) => ({ url: i.url, alt: i.alt })),
-    },
+    }),
   };
 }
 

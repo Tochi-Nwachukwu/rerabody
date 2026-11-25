@@ -27,6 +27,7 @@ import {
   PAGE_COPY,
   PRODUCT_COPY,
   SEO_DESCRIPTION,
+  SEO_TITLE,
   SHIPPING_METHODS,
 } from "./content";
 
@@ -590,7 +591,7 @@ async function seedSettings() {
       ],
     },
     notifications: { adminAlertEmail: "orders-alerts@example.com", defaultLowStockThreshold: 5 },
-    seo: { defaultTitle: "Rera Body", defaultDescription: SEO_DESCRIPTION },
+    seo: { defaultTitle: SEO_TITLE, defaultDescription: SEO_DESCRIPTION },
     tracking: { carriers: [] },
     chatWidget: { enabled: false, provider: "tawk", siteId: "" },
   };
