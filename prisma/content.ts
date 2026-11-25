@@ -199,7 +199,7 @@ export const HOME_COPY = {
   },
   why: {
     heading: "Why Rera",
-    body: "We care about what goes on your skin. Every jar is made at home from organic butters and natural oils, with over 15 years of hands-on experience behind it.",
+    body: "We care about what goes on your skin. Every product is made at home from organic butters and natural oils, with over 15 years of hands-on experience behind it.",
     points: [
       "Rich organic butters and natural oils",
       "Made fresh when you order",
@@ -226,7 +226,7 @@ export const HOME_COPY = {
     body: "Every scent in every size, plus the robes. Start anywhere.",
   },
   about: {
-    heading: "Your skin, but better.",
+    heading: "About Rera Body",
     body: "Rera is dedicated to providing organic skincare for women. For over 15 years, we have made body butters by hand from natural, unrefined butters and oils, prepared fresh for every order. Our mission is to give women skincare they can trust, with ingredients that are good for the skin.",
   },
   steps: {
@@ -248,7 +248,7 @@ export const HOME_COPY = {
   },
   newsletter: {
     heading: "Join the list",
-    body: "New scents, new prints and the occasional offer. We only email when there's something to say.",
+    body: "We’d love to keep you updated on new products, restocks, and special offers. Join our mailing list for notes from Rera.",
   },
 };
 
