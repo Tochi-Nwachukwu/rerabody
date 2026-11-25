@@ -31,6 +31,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
+import { AdminLogo } from "./admin-logo";
 import type { AdminNavItem } from "./nav-items";
 
 const ICONS: Record<string, LucideIcon> = {
@@ -100,11 +101,8 @@ function NavList({ items, onNavigate }: { items: AdminNavItem[]; onNavigate?: ()
 export function AdminSidebar({ items }: { items: AdminNavItem[] }) {
   return (
     <aside className="bg-sidebar hidden w-60 shrink-0 border-r px-3 py-5 lg:block">
-      <Link
-        href="/admin"
-        className="font-heading mb-6 block px-2 text-xl font-semibold tracking-[0.1em] uppercase"
-      >
-        Rera Body
+      <Link href="/admin" className="mb-6 block px-2">
+        <AdminLogo />
       </Link>
       <NavList items={items} />
     </aside>
@@ -122,8 +120,8 @@ export function AdminMobileNav({ items }: { items: AdminNavItem[] }) {
       </SheetTrigger>
       <SheetContent side="left" className="w-72 overflow-y-auto px-3">
         <SheetHeader className="px-2">
-          <SheetTitle className="font-heading text-xl tracking-[0.1em] uppercase">
-            Rera Body
+          <SheetTitle>
+            <AdminLogo className="h-9" />
           </SheetTitle>
         </SheetHeader>
         <NavList items={items} onNavigate={() => setOpen(false)} />

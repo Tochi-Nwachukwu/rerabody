@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { requireStaff } from "@/server/auth/session";
 
+import { AdminLogo } from "./admin-logo";
 import { AdminMobileNav, AdminSidebar } from "./admin-nav";
 import { visibleNav } from "./nav-items";
 
@@ -17,11 +18,8 @@ export async function AdminShell({ children }: { children: ReactNode }) {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="bg-background/95 sticky top-0 z-30 flex h-14 items-center gap-2 border-b px-4 backdrop-blur">
           <AdminMobileNav items={items} />
-          <Link
-            href="/admin"
-            className="font-heading text-lg font-semibold tracking-[0.1em] uppercase lg:hidden"
-          >
-            Rera Body
+          <Link href="/admin" className="lg:hidden">
+            <AdminLogo className="h-8" />
           </Link>
           <div className="ml-auto flex items-center gap-3">
             <Link
