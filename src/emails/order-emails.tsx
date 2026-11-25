@@ -27,12 +27,16 @@ export function AdminNewOrder({
   email,
   needsReview,
   reviewReason,
+  isGift = false,
+  giftMessage = null,
 }: {
   order: EmailOrder;
   adminUrl: string;
   email: string;
   needsReview: boolean;
   reviewReason: string | null;
+  isGift?: boolean;
+  giftMessage?: string | null;
 }) {
   return (
     <EmailLayout
@@ -47,6 +51,11 @@ export function AdminNewOrder({
       <Text style={text}>
         {email} paid {formatMoney(order.total, order.currency)}.
       </Text>
+      {isGift ? (
+        <Text style={{ ...text, fontWeight: 600 }}>
+          Gift order{giftMessage ? `. Message for the box: "${giftMessage}"` : "."}
+        </Text>
+      ) : null}
       <Button href={adminUrl} style={button}>
         Open in admin
       </Button>

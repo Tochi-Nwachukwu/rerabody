@@ -514,6 +514,10 @@ model Order {
   needsManualReview    Boolean     @default(false)
   manualReviewReason   String?
   paidAt               DateTime?
+  // The buyer marked the order as a gift: the packing slip leaves out prices.
+  isGift               Boolean     @default(false)
+  // Optional note to print and put in the box.
+  giftMessage          String?
   // Cart the order was created from, so the paid lines can be cleared from it. No FK: carts are short-lived.
   sourceCartId         String?
   createdAt            DateTime    @default(now())

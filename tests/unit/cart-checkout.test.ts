@@ -29,7 +29,10 @@ async function shipping(price = 395) {
   return testDb.shippingMethod.create({ data: { name: "Standard", price } });
 }
 
-async function checkout(guestToken: string, opts: { userId?: string | null; email?: string } = {}) {
+async function checkout(
+  guestToken: string,
+  opts: { userId?: string | null; email?: string; isGift?: boolean; giftMessage?: string } = {},
+) {
   const ship = await shipping();
   return createOrderFromCart(testDb, provider, {
     identity: { userId: opts.userId ?? null, guestToken: opts.userId ? null : guestToken },
@@ -38,6 +41,8 @@ async function checkout(guestToken: string, opts: { userId?: string | null; emai
     address,
     shippingMethodId: ship.id,
     saveAddress: false,
+    isGift: opts.isGift,
+    giftMessage: opts.giftMessage,
     currency: "GBP",
     appUrl: "http://localhost:3000",
     now,
@@ -155,6 +160,62 @@ describe("checkout and payment webhook", () => {
     expect(order.payments[0]).toMatchObject({ provider: "fake", status: "PENDING", amount: 3995 });
     expect(order.guestAccessTokenHash).not.toBe(res.guestToken);
     expect(res.url).toContain("/checkout/fake-pay?session=fs_");
+  });
+
+  it("stores the gift flag and message, and drops a message when the order is not a gift", async () => {
+    const p = await createProduct({ variants: [{ stock: 5, price: 1800 }] });
+    const id = { userId: null, guestToken: "gift" };
+    await addToCart(testDb, id, { variantId: p.variants[0].id, quantity: 1 });
+    const gift = await checkout("gift", { isGift: true, giftMessage: "Happy birthday, Mum" });
+    expect(await testDb.order.findUniqueOrThrow({ where: { id: gift.orderId } })).toMatchObject({
+      isGift: true,
+      giftMessage: "Happy birthday, Mum",
+    });
+
+    await addToCart(
+      testDb,
+      { userId: null, guestToken: "plain" },
+      { variantId: p.variants[0].id, quantity: 1 },
+    );
+    const plain = await checkout("plain", { isGift: false, giftMessage: "ignored" });
+    expect(await testDb.order.findUniqueOrThrow({ where: { id: plain.orderId } })).toMatchObject({
+      isGift: false,
+      giftMessage: null,
+    });
+  });
+
+  it("adds one gift box per gift set at the fee in settings, and pays without review", async () => {
+    const giftSets = await testDb.category.create({
+      data: { name: "Gift Sets", slug: "gift-sets" },
+    });
+    await testDb.siteSetting.create({ data: { key: "giftSets", value: { boxFee: 650 } } });
+    const set = await createProduct({
+      categoryId: giftSets.id,
+      variants: [{ stock: 5, price: 8700 }],
+    });
+    const butter = await createProduct({ variants: [{ stock: 5, price: 1800 }] });
+    const id = { userId: null, guestToken: "box" };
+    await addToCart(testDb, id, { variantId: set.variants[0].id, quantity: 2 });
+    await addToCart(testDb, id, { variantId: butter.variants[0].id, quantity: 1 });
+
+    const cart = await loadCart(testDb, id, { now, format: fmt });
+    expect(cart.giftBox).toMatchObject({ quantity: 2, unitPrice: 650, total: 1300 });
+    expect(cart.subtotal).toBe(8700 * 2 + 1800 + 1300);
+
+    const res = await checkout("box");
+    const order = await testDb.order.findUniqueOrThrow({
+      where: { id: res.orderId },
+      include: { items: true },
+    });
+    expect(order.subtotal).toBe(8700 * 2 + 1800 + 1300);
+    expect(order.items.find((i) => i.sku === "GIFT-BOX")).toMatchObject({
+      productName: "Gift box",
+      variantId: null,
+      unitPrice: 650,
+      quantity: 2,
+      lineTotal: 1300,
+    });
+    expect(await pay(res.orderId)).toMatchObject({ status: "paid", needsReview: false });
   });
 
   it("re-validates the coupon when the order is created (rule 8)", async () => {

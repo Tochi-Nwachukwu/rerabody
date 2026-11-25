@@ -20,7 +20,7 @@ type Address = {
   country: string;
 };
 
-// Packing slip: printable, no prices.
+// Packing slip: printable, no prices. Gift orders end with the gift message instead of a thank-you.
 export default function PackingSlipPage({ params }: PageProps<"/admin/print/orders/[id]">) {
   return (
     <Suspense>
@@ -108,7 +108,16 @@ async function Slip({ params }: { params: PageProps<"/admin/print/orders/[id]">[
           ))}
         </tbody>
       </table>
-      <p className="mt-8 text-sm">Thank you for your order.</p>
+      {order.isGift ? (
+        <section className="mt-8 rounded-lg border-2 border-dashed border-neutral-400 p-6 text-center">
+          <p className="font-heading text-xl">A gift for you</p>
+          {order.giftMessage ? (
+            <p className="mt-3 text-base whitespace-pre-line">{order.giftMessage}</p>
+          ) : null}
+        </section>
+      ) : (
+        <p className="mt-8 text-sm">Thank you for your order.</p>
+      )}
     </main>
   );
 }

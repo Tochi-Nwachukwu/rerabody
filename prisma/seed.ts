@@ -106,6 +106,7 @@ async function seedOwner(ownerRoleId: string) {
 const CATEGORIES = [
   { slug: "body-butters", name: "Body Butters", position: 0 },
   { slug: "loungewear", name: "Loungewear", position: 1 },
+  { slug: "gift-sets", name: "Gift Sets", position: 2 },
 ] as const;
 
 const COLLECTIONS = [
@@ -177,8 +178,14 @@ const PRODUCT_PHOTOS: Record<
   "mustard-botanical-robe": {
     width: 1333,
     height: 2000,
-    bytes: 230648,
+    bytes: 220180,
     alt: "Model in the Mustard Botanical robe, a long mustard wrap robe with a white botanical print, holding a mug",
+  },
+  "mustard-botanical-gift-set": {
+    width: 1228,
+    height: 1536,
+    bytes: 251280,
+    alt: "Rera gift box with a folded Mustard Botanical robe and a 16 oz jar of Lemon Dream body butter",
   },
 };
 
@@ -238,24 +245,27 @@ const PRODUCTS: SeedProduct[] = [
     [800, 1600, 2600],
     [30, 50, 20],
   ),
-  {
-    ...butter(
-      "true-blue-body-butter",
-      "True Blue Body Butter",
-      "BB-TRB",
-      [1000, 2000, 3200],
-      [15, 0, 12],
-    ),
-    collections: ["body-butters", "gift-sets"],
-  },
+  butter(
+    "true-blue-body-butter",
+    "True Blue Body Butter",
+    "BB-TRB",
+    [1000, 2000, 3200],
+    [15, 0, 12],
+  ),
   loungewear("purple-geo-robe", "Purple Geo Robe", "LW-PGEO", 5800, 12),
-  {
-    ...loungewear("green-leaf-robe", "Green Leaf Robe", "LW-GLEAF", 5800, 10),
-    collections: ["loungewear", "gift-sets"],
-  },
+  loungewear("green-leaf-robe", "Green Leaf Robe", "LW-GLEAF", 5800, 10),
   loungewear("mustard-botanical-robe", "Mustard Botanical Robe", "LW-MBOT", 5800, 8),
   // No photo yet, so it stays a draft until one is added in the admin.
   { ...loungewear("olive-floral-robe", "Olive Floral Robe", "LW-OFLO", 5800, 10), status: "DRAFT" },
+  // Ready-made gift set, packed in a Rera gift box. The box fee (Settings > Gift sets) is added in the cart.
+  {
+    slug: "mustard-botanical-gift-set",
+    name: "Mustard Botanical Gift Set",
+    category: "gift-sets",
+    collections: ["gift-sets"],
+    options: [],
+    variants: [{ sku: "GS-MBOT-LEM16", optionValues: {}, price: 8700, stock: 5 }],
+  },
 ];
 
 async function seedCatalogue() {
@@ -395,7 +405,7 @@ async function seedHomeSections(
       "rera-robes.webp",
       2553,
       1280,
-      372530,
+      368692,
       "Three Rera robes side by side: Purple Geo, Green Leaf and Mustard Botanical",
     ),
     await marketing(
@@ -592,6 +602,7 @@ async function seedSettings() {
     },
     notifications: { adminAlertEmail: "orders-alerts@example.com", defaultLowStockThreshold: 5 },
     seo: { defaultTitle: SEO_TITLE, defaultDescription: SEO_DESCRIPTION },
+    giftSets: { boxFee: 500 },
     tracking: { carriers: [] },
     chatWidget: { enabled: false, provider: "tawk", siteId: "" },
   };

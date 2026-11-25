@@ -3,6 +3,7 @@ import { UserError } from "@/server/errors";
 import { variantLabel } from "@/lib/variants";
 
 import { validateCoupon } from "./coupons";
+import { type GiftBox, giftBoxFor, giftBoxPricedLine } from "./gift-box";
 import { type PricedLine, computeTotals } from "./pricing";
 
 type Db = PrismaClient | Prisma.TransactionClient;
@@ -30,6 +31,8 @@ export type CartView = {
   id: string | null;
   lines: CartLineView[];
   count: number;
+  /** Gift box charge for gift sets in the cart. Included in subtotal. */
+  giftBox: GiftBox | null;
   subtotal: number;
   discountTotal: number;
   total: number;
@@ -41,6 +44,7 @@ export const EMPTY_CART: CartView = {
   id: null,
   lines: [],
   count: 0,
+  giftBox: null,
   subtotal: 0,
   discountTotal: 0,
   total: 0,
@@ -253,13 +257,17 @@ export async function loadCart(
     });
   }
 
+  const priced = toPricedLines(lines, categoryOf);
+  const giftBox = await giftBoxFor(db, priced);
+  if (giftBox) priced.push(giftBoxPricedLine(giftBox));
+
   let discount = 0;
   let coupon: CartView["coupon"] = null;
   if (cart.coupon) {
     const { result } = await validateCoupon(
       db,
       cart.coupon.code,
-      toPricedLines(lines, categoryOf),
+      priced,
       { userId: cart.userId, email: opts.email ?? cart.email },
       opts.now,
       opts.format,
@@ -273,11 +281,12 @@ export async function loadCart(
     }
   }
 
-  const totals = computeTotals(toPricedLines(lines, categoryOf), discount, 0);
+  const totals = computeTotals(priced, discount, 0);
   return {
     id: cart.id,
     lines,
     count: lines.reduce((n, l) => n + l.quantity, 0),
+    giftBox,
     subtotal: totals.subtotal,
     discountTotal: totals.discountTotal,
     total: totals.total,
@@ -297,12 +306,13 @@ export async function applyCoupon(
   const categories = new Map(
     cart.items.map((i) => [i.variant.product.id, i.variant.product.categoryId]),
   );
-  const lines = view.lines.map((l) => ({
+  const lines: PricedLine[] = view.lines.map((l) => ({
     productId: l.productId,
     categoryId: categories.get(l.productId) ?? null,
     unitPrice: l.unitPrice,
     quantity: l.quantity,
   }));
+  if (view.giftBox) lines.push(giftBoxPricedLine(view.giftBox));
   const { coupon, result } = await validateCoupon(
     db,
     input.code,

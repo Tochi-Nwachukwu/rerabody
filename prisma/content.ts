@@ -57,17 +57,20 @@ export function rich(...lines: string[]): RichDoc {
 // Catalogue
 // ---------------------------------------------------------------------------
 
+const GIFT_SETS_COPY =
+  "Ready-made gift sets, packed in a Rera gift box. Add a gift message at checkout and we can send it straight to them.";
+
 export const CATEGORY_COPY: Record<string, string> = {
   "body-butters":
     "Rich body butters in Vanilla, Lemon Dream, Cranberry Fig + Lavender and True Blue. Every scent comes in 3, 8 and 16 oz jars.",
   loungewear:
     "Long wrap robes in bold prints, with wide sleeves, a tie belt and deep pockets. One free size.",
+  "gift-sets": GIFT_SETS_COPY,
 };
 
 export const COLLECTION_COPY: Record<string, string> = {
   ...CATEGORY_COPY,
-  "gift-sets":
-    "Easy presents. Pair a robe with a jar of body butter, or send either one on its own.",
+  "gift-sets": GIFT_SETS_COPY,
 };
 
 const BUTTER_SPECS = rich(
@@ -168,6 +171,20 @@ export const PRODUCT_COPY: Record<string, ProductCopy> = {
     sizeGuide: ROBE_SIZE_GUIDE,
     metaDescription:
       "The Rera Olive Floral robe: a long olive wrap robe with a white floral print. One free size.",
+  },
+  "mustard-botanical-gift-set": {
+    description: rich(
+      "Our Mustard Botanical robe and a 16 oz jar of Lemon Dream body butter, packed together in a Rera gift box.",
+      "At checkout, tick “This order is a gift” to add a message for the box. We can send it straight to them.",
+    ),
+    specs: rich(
+      "- Mustard Botanical Robe, one free size",
+      "- Lemon Dream Body Butter, 16 oz jar",
+      "- Packed in a Rera gift box. The gift box fee is added in your cart.",
+      "- Prices are never included in the box",
+    ),
+    metaDescription:
+      "The Rera Mustard Botanical Gift Set: a Mustard Botanical robe and a 16 oz Lemon Dream body butter in a gift box.",
   },
 };
 

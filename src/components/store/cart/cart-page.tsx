@@ -45,6 +45,12 @@ export function CartPage({ taxAtPayment = false }: { taxAtPayment?: boolean }) {
         <h2 className="font-heading text-2xl">Summary</h2>
         <CouponForm />
         <dl className="flex flex-col gap-2 text-sm">
+          {cart.giftBox ? (
+            <div className="text-muted-foreground flex justify-between">
+              <dt>Gift box{cart.giftBox.quantity > 1 ? ` × ${cart.giftBox.quantity}` : ""}</dt>
+              <dd className="tabular-nums">{formatMoney(cart.giftBox.total, currency)}</dd>
+            </div>
+          ) : null}
           <div className="flex justify-between">
             <dt>Subtotal</dt>
             <dd className="tabular-nums">{formatMoney(cart.subtotal, currency)}</dd>

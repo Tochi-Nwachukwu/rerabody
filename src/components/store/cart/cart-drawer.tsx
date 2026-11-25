@@ -60,6 +60,14 @@ export function CartDrawer() {
         </div>
         {cart && cart.lines.length > 0 ? (
           <SheetFooter className="border-t">
+            {cart.giftBox ? (
+              <div className="text-muted-foreground flex justify-between text-sm">
+                <span>
+                  Gift box{cart.giftBox.quantity > 1 ? ` × ${cart.giftBox.quantity}` : ""}
+                </span>
+                <span className="tabular-nums">{formatMoney(cart.giftBox.total, currency)}</span>
+              </div>
+            ) : null}
             <div className="flex justify-between text-sm">
               <span>Subtotal</span>
               <span className="font-medium tabular-nums">

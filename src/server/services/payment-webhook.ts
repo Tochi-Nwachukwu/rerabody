@@ -3,6 +3,7 @@ import { isUniqueConstraintError } from "@/server/errors";
 import type { PaymentEvent } from "@/server/payments/types";
 
 import { transitionOrder } from "./order-status";
+import { GIFT_BOX_SKU } from "./gift-box";
 
 export type WebhookOutcome =
   | { status: "duplicate" }
@@ -124,7 +125,9 @@ async function markPaid(
   // Rule 3: conditional decrement, so stock never goes negative.
   for (const item of order.items) {
     if (!item.variantId) {
-      reasons.push(`${item.sku} no longer exists, so stock was not taken.`);
+      // The gift box line has no variant or stock of its own.
+      if (item.sku !== GIFT_BOX_SKU)
+        reasons.push(`${item.sku} no longer exists, so stock was not taken.`);
       continue;
     }
     const updated = await tx.productVariant.updateMany({

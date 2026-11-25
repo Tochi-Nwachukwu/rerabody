@@ -9,6 +9,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { FormMessage, TextField } from "@/components/form/text-field";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { formatMoney } from "@/lib/money";
 import { type CheckoutInput, checkoutSchema } from "@/lib/schemas/checkout";
 import { startCheckoutAction } from "@/server/actions/checkout";
@@ -53,10 +54,13 @@ export function CheckoutForm({
       },
       shippingMethodId: shippingMethods[0]?.id ?? "",
       saveAddress: false,
+      isGift: false,
+      giftMessage: "",
     },
   });
   const shippingId = useWatch({ control: form.control, name: "shippingMethodId" });
   const saveAddress = useWatch({ control: form.control, name: "saveAddress" });
+  const isGift = useWatch({ control: form.control, name: "isGift" });
   const shipping = shippingMethods.find((m) => m.id === shippingId);
   const total = cart.total + (shipping?.price ?? 0);
   const { errors, isSubmitting } = form.formState;
@@ -201,6 +205,44 @@ export function CheckoutForm({
         </fieldset>
 
         <fieldset className="flex flex-col gap-3">
+          <legend className="font-heading mb-3 text-2xl">Gift</legend>
+          <label className="flex items-start gap-2 text-sm">
+            <Checkbox
+              className="mt-0.5"
+              checked={!!isGift}
+              onCheckedChange={(c) => form.setValue("isGift", !!c)}
+            />
+            <span>
+              This order is a gift
+              <span className="text-muted-foreground block text-xs">
+                Send it straight to them: put their name and address above. Prices are never
+                included in the box.
+              </span>
+            </span>
+          </label>
+          {isGift ? (
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="giftMessage" className="text-sm font-medium">
+                Gift message (optional)
+              </label>
+              <Textarea
+                id="giftMessage"
+                rows={3}
+                maxLength={300}
+                placeholder="We'll print this and put it in the box."
+                aria-invalid={!!errors.giftMessage}
+                {...form.register("giftMessage")}
+              />
+              {errors.giftMessage ? (
+                <p role="alert" className="text-destructive text-sm">
+                  {errors.giftMessage.message}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+        </fieldset>
+
+        <fieldset className="flex flex-col gap-3">
           <legend className="font-heading mb-3 text-2xl">Delivery</legend>
           {shippingMethods.length === 0 ? (
             <FormMessage>Delivery is not available right now. Please contact us.</FormMessage>
@@ -262,6 +304,12 @@ export function CheckoutForm({
           ))}
         </ul>
         <dl className="flex flex-col gap-2 border-t pt-3 text-sm">
+          {cart.giftBox ? (
+            <div className="text-muted-foreground flex justify-between">
+              <dt>Gift box{cart.giftBox.quantity > 1 ? ` × ${cart.giftBox.quantity}` : ""}</dt>
+              <dd className="tabular-nums">{formatMoney(cart.giftBox.total, currency)}</dd>
+            </div>
+          ) : null}
           <div className="flex justify-between">
             <dt>Subtotal</dt>
             <dd className="tabular-nums">{formatMoney(cart.subtotal, currency)}</dd>

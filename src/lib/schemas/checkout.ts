@@ -68,6 +68,14 @@ export const checkoutSchema = z.object({
   address: addressSchema,
   shippingMethodId: z.string().min(1, "Choose a delivery option"),
   saveAddress: z.boolean().default(false),
+  /** Gift orders print a gift message on the packing slip, which never shows prices. */
+  isGift: z.boolean().default(false),
+  giftMessage: z
+    .string()
+    .trim()
+    .max(300, "Keep the gift message under 300 characters")
+    .optional()
+    .transform((v) => v || undefined),
 });
 export type CheckoutInput = z.input<typeof checkoutSchema>;
 

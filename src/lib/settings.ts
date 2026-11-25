@@ -32,6 +32,11 @@ export const settingSchemas = {
     defaultTitle: z.string().max(70).default("Rera Body"),
     defaultDescription: z.string().max(170).default(""),
   }),
+  // Products in the Gift Sets category are packed in a gift box. This fee is charged once
+  // per gift set, as a "Gift box" line in the cart and on the order. Minor units.
+  giftSets: z.object({
+    boxFee: z.number().int().min(0).max(100000).default(500),
+  }),
   tracking: z.object({
     // urlPattern uses {tracking} as the placeholder, e.g. https://carrier.example/track/{tracking}
     carriers: z

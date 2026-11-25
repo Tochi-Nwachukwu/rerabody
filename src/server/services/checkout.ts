@@ -7,6 +7,7 @@ import type { PaymentProvider } from "@/server/payments/types";
 import { generateToken, hashToken, tokenMatchesHash } from "@/server/tokens";
 
 import { type CartIdentity, findCart } from "./cart";
+import { GIFT_BOX_NAME, GIFT_BOX_SKU, giftBoxFor, giftBoxPricedLine } from "./gift-box";
 import { validateCoupon } from "./coupons";
 import { transitionOrder } from "./order-status";
 import { type PricedLine, computeTotals } from "./pricing";
@@ -18,6 +19,8 @@ export type CreateOrderInput = {
   address: AddressData;
   shippingMethodId: string;
   saveAddress: boolean;
+  isGift?: boolean;
+  giftMessage?: string;
   currency: string;
   appUrl: string;
   now: Date;
@@ -83,6 +86,9 @@ export async function createOrderFromCart(
     unitPrice: l.unitPrice,
     quantity: l.quantity,
   }));
+  // One gift box per gift set, at the fee in settings. It is an order line with no variant.
+  const giftBox = await giftBoxFor(prisma, priced);
+  if (giftBox) priced.push(giftBoxPricedLine(giftBox));
   let discount = 0;
   let couponCode: string | null = null;
   if (cart.coupon) {
@@ -115,6 +121,8 @@ export async function createOrderFromCart(
         ...totals,
         currency: input.currency,
         couponCode,
+        isGift: input.isGift ?? false,
+        giftMessage: input.isGift ? (input.giftMessage ?? null) : null,
         shippingAddress: input.address,
         shippingMethod: {
           id: shipping.id,
@@ -126,17 +134,34 @@ export async function createOrderFromCart(
         guestAccessTokenHash: hashToken(guestToken),
         sourceCartId: cart.id,
         items: {
-          create: lines.map((l) => ({
-            variantId: l.variantId,
-            productId: l.productId,
-            productName: l.productName,
-            variantLabel: l.variantLabel,
-            sku: l.sku,
-            imageUrl: l.imageUrl,
-            unitPrice: l.unitPrice,
-            quantity: l.quantity,
-            lineTotal: l.unitPrice * l.quantity,
-          })),
+          create: [
+            ...lines.map((l) => ({
+              variantId: l.variantId as string | null,
+              productId: l.productId as string | null,
+              productName: l.productName,
+              variantLabel: l.variantLabel,
+              sku: l.sku,
+              imageUrl: l.imageUrl,
+              unitPrice: l.unitPrice,
+              quantity: l.quantity,
+              lineTotal: l.unitPrice * l.quantity,
+            })),
+            ...(giftBox
+              ? [
+                  {
+                    variantId: null,
+                    productId: null,
+                    productName: GIFT_BOX_NAME,
+                    variantLabel: "Default",
+                    sku: GIFT_BOX_SKU,
+                    imageUrl: null,
+                    unitPrice: giftBox.unitPrice,
+                    quantity: giftBox.quantity,
+                    lineTotal: giftBox.total,
+                  },
+                ]
+              : []),
+          ],
         },
         statusEvents: {
           create: { fromStatus: null, toStatus: "PENDING_PAYMENT", note: "Checkout started" },
@@ -163,7 +188,11 @@ export async function createOrderFromCart(
   });
 
   // Tax codes come from each product's category (Stripe uses them only when tax is on).
-  const categoryIds = [...new Set(lines.map((l) => l.categoryId).filter((c): c is string => !!c))];
+  const categoryIds = [
+    ...new Set(
+      [...lines.map((l) => l.categoryId), giftBox?.categoryId].filter((c): c is string => !!c),
+    ),
+  ];
   const taxCodeOf = new Map(
     (
       await prisma.category.findMany({
@@ -183,13 +212,27 @@ export async function createOrderFromCart(
       orderNumber: order.number,
       email: input.email,
       currency: input.currency,
-      lines: lines.map((l) => ({
-        name: l.variantLabel === "Default" ? l.productName : `${l.productName} (${l.variantLabel})`,
-        unitAmount: l.unitPrice,
-        quantity: l.quantity,
-        imageUrl: absolute(l.imageUrl),
-        taxCode: (l.categoryId && taxCodeOf.get(l.categoryId)) || undefined,
-      })),
+      lines: [
+        ...lines.map((l) => ({
+          name:
+            l.variantLabel === "Default" ? l.productName : `${l.productName} (${l.variantLabel})`,
+          unitAmount: l.unitPrice,
+          quantity: l.quantity,
+          imageUrl: absolute(l.imageUrl),
+          taxCode: (l.categoryId && taxCodeOf.get(l.categoryId)) || undefined,
+        })),
+        ...(giftBox
+          ? [
+              {
+                name: GIFT_BOX_NAME,
+                unitAmount: giftBox.unitPrice,
+                quantity: giftBox.quantity,
+                imageUrl: null,
+                taxCode: taxCodeOf.get(giftBox.categoryId) || undefined,
+              },
+            ]
+          : []),
+      ],
       shipping: { name: shipping.name, amount: shipping.price },
       address: code
         ? {

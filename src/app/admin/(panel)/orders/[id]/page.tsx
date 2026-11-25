@@ -201,6 +201,19 @@ export default async function OrderDetailPage({ params }: PageProps<"/admin/orde
             </p>
             <p className="text-muted-foreground text-sm">{order.email}</p>
           </Card>
+          {order.isGift ? (
+            <Card title="Gift">
+              <p className="text-sm">
+                Gift order. The packing slip has no prices
+                {order.giftMessage ? " and prints this message:" : "."}
+              </p>
+              {order.giftMessage ? (
+                <blockquote className="bg-muted mt-2 rounded-md p-3 text-sm whitespace-pre-line">
+                  {order.giftMessage}
+                </blockquote>
+              ) : null}
+            </Card>
+          ) : null}
           <Card title="Delivery">
             <address className="text-sm not-italic">
               {a.fullName}

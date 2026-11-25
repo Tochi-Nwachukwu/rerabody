@@ -101,6 +101,8 @@ export async function notifyOrderStatus(
             email: order.email,
             needsReview: order.needsManualReview,
             reviewReason: order.manualReviewReason,
+            isGift: order.isGift,
+            giftMessage: order.giftMessage,
           },
         });
       }

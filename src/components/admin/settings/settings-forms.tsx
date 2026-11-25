@@ -88,6 +88,7 @@ export function SettingsForms({
   const [seo, setSeo] = useState(settings.seo);
   const [carriers, setCarriers] = useState(settings.tracking.carriers);
   const [chat, setChat] = useState(settings.chatWidget);
+  const [giftSets, setGiftSets] = useState(settings.giftSets);
   const [editing, setEditing] = useState<Method | null>(null);
 
   function save(parts: { key: keyof SiteSettings; value: unknown }[], message = "Settings saved") {
@@ -107,6 +108,7 @@ export function SettingsForms({
       <TabsList className="mb-4 w-full justify-start overflow-x-auto">
         <TabsTrigger value="store">Store</TabsTrigger>
         <TabsTrigger value="shipping">Shipping</TabsTrigger>
+        <TabsTrigger value="gift-sets">Gift sets</TabsTrigger>
         <TabsTrigger value="notifications">Notifications</TabsTrigger>
         <TabsTrigger value="seo">SEO</TabsTrigger>
         <TabsTrigger value="chat">Chat</TabsTrigger>
@@ -416,6 +418,30 @@ export function SettingsForms({
               Save carriers
             </Button>
           </div>
+        </Panel>
+      </TabsContent>
+
+      <TabsContent value="gift-sets" className="flex flex-col gap-6">
+        <Panel
+          title="Gift box"
+          description="Products in the Gift Sets category are packed in a gift box. This fee is added once for every gift set, as a “Gift box” line in the cart and on the order. Set it to 0 to stop charging."
+        >
+          <Field>
+            <FieldLabel htmlFor="gift-box-fee">Gift box fee</FieldLabel>
+            <MoneyInput
+              id="gift-box-fee"
+              currency={currency}
+              value={giftSets.boxFee}
+              onChange={(v) => setGiftSets({ ...giftSets, boxFee: Math.max(0, v ?? 0) })}
+            />
+          </Field>
+          <Button
+            className="self-start"
+            disabled={pending}
+            onClick={() => save([{ key: "giftSets", value: giftSets }])}
+          >
+            Save
+          </Button>
         </Panel>
       </TabsContent>
 

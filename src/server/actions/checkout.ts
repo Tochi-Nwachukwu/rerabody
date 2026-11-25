@@ -27,6 +27,8 @@ export const startCheckoutAction = publicAction(checkoutSchema, async (input) =>
     address: input.address,
     shippingMethodId: input.shippingMethodId,
     saveAddress: input.saveAddress,
+    isGift: input.isGift,
+    giftMessage: input.giftMessage,
     currency: env.STORE_CURRENCY,
     appUrl: env.NEXT_PUBLIC_APP_URL,
     now: new Date(),

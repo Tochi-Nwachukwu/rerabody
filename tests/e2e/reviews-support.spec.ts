@@ -70,6 +70,8 @@ test("a customer reviews a delivered product and it appears after the admin appr
 test("the contact form opens a ticket and the admin reply is emailed", async ({ page }) => {
   const email = uniqueEmail("contact");
   await page.goto("/contact");
+  // Typing before the form hydrates can be wiped on mobile; wait for the page to settle.
+  await page.waitForLoadState("networkidle");
   await page.getByLabel("Name").fill("Curious Customer");
   await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Subject").fill("Sizing question");
